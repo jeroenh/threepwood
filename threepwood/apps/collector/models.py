@@ -37,16 +37,16 @@ class Client(models.Model):
             return None
 
     def last_seen(self):
-        session = self.last_session()
-        if session:
-            return session.date_created
+        sessions = self.session_set.all().order_by('-date_created')
+        if len(sessions)>0:
+            return sessions[0].date_created
         else:
             return None
 
     def last_ip(self):
-        session = self.last_session()
-        if session:
-            return session.ip
+        sessions = self.session_set.all().order_by('-date_created')
+        if len(sessions)>0:
+            return sessions[0].ip
         else:
             return None
 
