@@ -13,5 +13,5 @@ class TorrentReport(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
-        torrent = self.get_object()
-        records = PeerRecord.objects.filter(torrent=torrent).values('ip').distinct().count()
+#        torrent = self.get_object()
+        return context

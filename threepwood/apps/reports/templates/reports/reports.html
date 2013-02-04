@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+
+{% block container %}
+    <div class="row-fluid">
+        <div class="span2">
+            <ul class="nav nav-list" data-spy="affix" data-offset-top="50">
+                <li><a href="#"><i class="icon-chevron-right"></i> Torrents</a></li>
+            </ul>
+            {% block controls %}
+            {% endblock controls %}
+        </div>
+        <div class="span10">
+            {% block report%}
+            {% endblock report%}
+        </div>
+    </div>
+{% endblock %}

@@ -8,9 +8,10 @@
         <div class="btn-group pull-right">
             <a href="{% url 'collector_torrent_delete' torrent.pk %}" class="btn btn-danger "><i
                     class="icon-white icon-remove-sign"></i> Delete</a>
-            <a href="{% url 'collector_torrent_update' torrent.pk %}" class="btn btn-info"><i
+            <a href="{% url 'collector_torrent_update' torrent.pk %}" class="btn btn-primary"><i
                     class="icon-white icon-edit"></i> Edit</a>
             <a href="{{ torrent.magnet }}" class="btn btn-warning"> <i class="icon-magnet icon-white" ></i> Magnet</a>
+            <a href="{% url 'reports_torrent_report' torrent.pk %}" class="btn btn-info"> <i class="icon-magnet icon-white" ></i> Stats</a>
 
         </div>
     </h1>

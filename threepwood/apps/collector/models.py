@@ -68,6 +68,8 @@ class Torrent(models.Model):
 
         super(Torrent, self).save(*args, **kwargs)
 
+
+
 class TorrentMetadata(models.Model):
     name = models.CharField(max_length=256, blank=True, null=True)
     comment = models.CharField(max_length=1500, blank=True,  null=True)
@@ -107,6 +109,9 @@ class Session(models.Model):
         if not self.key:
             self.key = _generate_key()
         super(Session, self).save(*args, **kwargs)
+
+    def get_size(self):
+        return self.peerrecord_set.values_list('ip',flat=True).distinct().count()
 
     def __unicode__(self):
         return u"{0} {1} {2}".format(self.client, self.torrent.torrentmetadata.name, self.date_created)

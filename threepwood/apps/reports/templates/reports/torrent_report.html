@@ -1,9 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
+{% extends 'reports/reports.html' %}
+{% load crispy_forms_tags %}
+{% load url from future %}
 
-</body>
-</html>
+{% block report %}
+
+    {{ torrent }}
+
+     <table class="table">
+     <thead>
+     <th>Created</th>
+     <th>Peer count</th>
+     </thead>
+     <tbody>
+    {% for session in torrent.session_set.all %}
+        <tr>
+            <td>{{ session.date_created }}</td>
+            <td>{{ session.get_size }}</td>
+        </tr>
+    {% endfor %}
+     </tbody>
+     </table>
+{% endblock%}
