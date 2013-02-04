@@ -31,7 +31,7 @@
         {% for client in client_list %}
             <tr data-id="{{ client.id }}">
                 <td>
-                    <a href="{% url "collector_client_detail" client.pk %}">{{ client.key }}</a>
+                    <a href="{% url "collector_client_detail" client.pk %}">{{ client.key|truncatechars:28 }}</a>
                 </td>
                 <td>
                     {{ client.description|truncatechars:32 }}
