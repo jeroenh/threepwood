@@ -94,7 +94,7 @@ def create_metadata(sender, instance, created, **kwargs):
 
 class Session(models.Model):
 
-    LIFETIME = 6000
+    LIFETIME = 3600
 
     client = models.ForeignKey(Client)
     ip = models.GenericIPAddressField()
