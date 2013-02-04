@@ -160,9 +160,8 @@ def get_sessions_and_torrents_for_client(client, ip):
     for hash in hashes:
         try:
             session = client.last_session(hash)
-            if not session or now() - session.date_created > timedelta(seconds=Session.MAX_REPORT_INTERVAL):
-                #if a client reports at intervals larger than max report seconds then we create a new session for it
-                #TODO this looks funny
+            if not session or now() - session.date_created > timedelta(seconds=Session.LIFETIME):
+                #if the last session expired create a new one
                 raise  ObjectDoesNotExist
         except ObjectDoesNotExist:
             torrent = Torrent.objects.get(info_hash=hash)

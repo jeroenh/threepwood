@@ -90,7 +90,6 @@ def create_metadata(sender, instance, created, **kwargs):
 
 class Session(models.Model):
 
-    MAX_REPORT_INTERVAL  = 60
     LIFETIME = 6000
 
     client = models.ForeignKey(Client)
