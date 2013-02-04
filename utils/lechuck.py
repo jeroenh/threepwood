@@ -1,19 +1,17 @@
+#!/usr/bin/env python
+
 import Queue
-import os
-import sys
 import signal
-
-__author__ = 'cdumitru'
-
 from logging.handlers import TimedRotatingFileHandler
 from threading import Thread
 import libtorrent as lt
 import time
 from datetime import datetime, timedelta
-
 import logging
 import requests
 import json
+
+__author__ = 'cdumitru'
 
 KEY = "484a19fdfe37375617dda5364f01e7a477d41386"
 #KEY = "484a19fdfe37375617dda5364f01e7a477d41381"
