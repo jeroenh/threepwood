@@ -24,6 +24,8 @@ LOG_LEVEL_FILE = 'debug' # Options: debug, info, warning, error, critical
 THREEPWOOD_POST_URL = "http://localhost:8000/collector/post_peers/"  #do not forget the trailing /
 THREEPWOOD_GET_URL = "http://localhost:8000/collector/get_torrents/?key=" + KEY
 
+
+#TODO get these values from guybrush
 MAX_PEERS_THRESHOLD = 20
 REPORT_INTERVAL = 60
 MAX_TRIES = 5
@@ -44,9 +46,9 @@ def request(type, url, data=None):
     return json  decoded response
     """
     try_count = 0
-    response = {'success': False}
     json_encoded_data = None
     logger = logging.getLogger("lechuck")
+    response = {'success': False}
 
     if type == 'POST':
         json_encoded_data = DateTimeJSONEncoder().encode(data)
@@ -60,15 +62,18 @@ def request(type, url, data=None):
 
             if response.status_code != 200:
                 logger.critical("Threepwood server error. Status code:{0}".format(response.status_code))
+                raise Exception('status code')
             if not response.json()['success']:
                 logger.critical("Threepwood service error: {0}".format(response.json()['message']))
+                raise Exception('failed')
 
             return response.json()
 
-        except requests.ConnectionError as e:
+        except Exception as e:
             try_count += 1
             logger.critical("Unable to connect: {0}. {1} tries left".format(e, MAX_TRIES - try_count))
             time.sleep(1)
+            response = {'success': False}
 
     return response
 
@@ -115,7 +120,7 @@ class Torrent(Thread):
         info.add_tracker('udp://tracker.istole.it:80', 0)
         self.logger.info("Adding hash {0} to session".format(self.info_hash))
 #        self.handle = self.libtorrent_session.add_torrent(info, './')
-        self.handle = lt.add_magnet_uri(self.libtorrent_session, self.magnet, {'save_path': './'})
+        self.handle = lt.add_magnet_uri(self.libtorrent_session, str(self.magnet), {'save_path': './'})
 
         #wait for the download to start
         while not self.handle.status().state == self.handle.status().downloading:
@@ -215,7 +220,6 @@ def init_logger():
 
 def get_torrents():
     response = request('GET', THREEPWOOD_GET_URL)
-    print response
     if not response['success']:
         response['torrents'] = []
     return response

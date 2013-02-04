@@ -8,7 +8,7 @@ from django.utils.simplejson import dumps, loads
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 from threepwood.apps.collector.forms import TorrentForm, ClientCreateForm, ClientUpdateForm, TorrentAddClientForm, ConfirmDelete, TorrentRemoveClientForm, TorrentUpdateForm, ClientAddTorrentForm
-from threepwood.apps.collector.models import Client, Torrent, PeerRecord, Session
+from threepwood.apps.collector.models import Client, Torrent, PeerRecord, Session, RawPeerRecord
 
 __author__ = 'cdumitru'
 
@@ -126,6 +126,17 @@ def post_peers(request):
                 record = {'ip':peer, 'session':session}
                 PeerRecord(**record).save()
 
+
+                #FIXME this should be temporary until cascading deletes are well understood
+                record  = {
+                    'ip':peer,
+                    'info_hash':session.torrent.info_hash ,
+                    'client_ip':ip,
+                    'client_key':session.client.key,
+                    'session_key':session.key
+                }
+                RawPeerRecord(**record).save()
+
         res['success'] = True
         res['client_active'] = session.client.active
         res['session_active'] = session.is_active()
@@ -149,6 +160,7 @@ def get_sessions_and_torrents_for_client(client, ip):
             session = client.last_session(hash)
             if not session or now() - session.date_created > timedelta(seconds=Session.MAX_REPORT_INTERVAL):
                 #if a client reports at intervals larger than max report seconds then we create a new session for it
+                #TODO this looks funny
                 raise  ObjectDoesNotExist
         except ObjectDoesNotExist:
             torrent = Torrent.objects.get(info_hash=hash)

@@ -91,7 +91,7 @@ def create_metadata(sender, instance, created, **kwargs):
 class Session(models.Model):
 
     MAX_REPORT_INTERVAL  = 60
-    LIFETIME = 600
+    LIFETIME = 6000
 
     client = models.ForeignKey(Client)
     ip = models.GenericIPAddressField()
@@ -127,4 +127,5 @@ class RawPeerRecord(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     info_hash = models.CharField(max_length=40)
     client_ip = models.GenericIPAddressField()
-    key = models.CharField(max_length=40, editable=False)
+    client_key = models.CharField(max_length=40)
+    session_key = models.CharField(max_length=40)
