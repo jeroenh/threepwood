@@ -1,0 +1,43 @@
+{% extends "collector/collector.html" %}
+{% load url from future %}
+
+
+
+{% block controls %}
+
+{% endblock %}
+{% block collector %}
+
+    <h1>Torrents ({{ torrent_list|length }}) <a href="{% url 'collector_torrent_add' %}" class="btn btn-primary pull-right"><i class="icon-white icon-plus"></i> Add torrent</a></h1>
+    <table class="table table-striped">
+        <thead><tr>
+            <th>Added</th>
+            <th>Info Hash</th>
+            <th>Description</th>
+            <th>Clients</th>
+            <th>Active</th>
+            <th></th>
+        </tr></thead>
+        <tbody>
+        {% for torrent in torrent_list %}
+            <tr data-id="{{ torrent.id }}">
+                <td>{{ torrent.date_added|date:'d-m-Y H:m:s' }}</td>
+                <td>
+                    <a href="{% url 'collector_torrent_detail' torrent.pk %}"> {{ torrent.info_hash|truncatechars:24 }} </a>
+                </td>
+                <td>
+                    {{ torrent.description|truncatechars:32 }}
+                </td>
+                <td>
+                    {{ torrent.clients.all|length}}
+                </td>
+                <td>{% if torrent.active %}Yes {% else %}No{% endif %}</td>
+                <td>
+                    <a href="{% url 'collector_torrent_delete' torrent.pk %}" class="btn btn-danger btn-mini"><i class="icon-white icon-remove-sign"></i> Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock collector %}

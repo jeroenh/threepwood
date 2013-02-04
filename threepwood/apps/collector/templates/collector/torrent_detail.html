@@ -1,0 +1,110 @@
+{% extends 'collector/collector.html' %}
+{% load crispy_forms_tags %}
+{% load url from future %}
+
+
+{% block collector %}
+    <h1>Torrent
+        <div class="btn-group pull-right">
+            <a href="{% url 'collector_torrent_delete' torrent.pk %}" class="btn btn-danger "><i
+                    class="icon-white icon-remove-sign"></i> Delete</a>
+            <a href="{% url 'collector_torrent_update' torrent.pk %}" class="btn btn-info"><i
+                    class="icon-white icon-edit"></i> Edit</a>
+            <a href="{{ torrent.magnet }}" class="btn btn-warning"> <i class="icon-magnet icon-white" ></i> Magnet</a>
+
+        </div>
+    </h1>
+
+    <h5>Description for {{ torrent.info_hash }}</h5>
+    <p>
+        {{ torrent.description }}
+    </p>
+
+
+
+
+    {% if torrent.torrentmetadata.name %}
+        <h5>Metadata</h5>
+        <ul class="unstyled">
+            <li>Added: {{ torrent.date_added }}</li>
+            <li>Name: {{ torrent.torrentmetadata.name }}</li>
+            <li>Size: {{ torrent.torrentmetadata.size|filesizeformat }}</li>
+            <li>Creator: {{ torrent.torrentmetadata.creator }}</li>
+            <li>Comment: {{ torrent.torrentmetadata.comment }}</li>
+            <li>Active: {{ torrent.active }}</li>
+        </ul>
+
+        <h3>Files</h3>
+        <table class="table">
+            <thead>
+            <th>Name</th>
+            <th>Size</th>
+            </thead>
+            <tbody>
+            {% for f in  torrent.torrentmetadata.files_as_list %}
+                <tr>
+                    <td>{{ f.0 }}</td>
+                    <td>{{ f.1|filesizeformat }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+
+    {% else %}
+        <p>
+        No metadata available
+        </p>
+    {% endif %}
+
+
+
+
+    <h3>Clients ({{ torrent.clients.all|length }})
+        <a href="{% url 'collector_torrent_assign_client' torrent.id %}" class="btn btn-primary pull-right"><i
+                class="icon-white icon-plus"></i>
+            Assign clients</a>
+    </h3>
+
+    {% if torrent.clients.all %}
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Client Key</th>
+                <th>Description</th>
+                <th>Torrents</th>
+                <th>Last seen</th>
+                <th>Last IP</th>
+                <th>Active</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for client in torrent.clients.all %}
+                <tr data-id="{{ client.id }}">
+                    <td>
+                        <a href="{% url "collector_client_detail" client.pk %}">{{ client.key|truncatechars:24 }}</a>
+                    </td>
+                    <td>{{ client.description }}</td>
+                    <td>{{ client.torrent_set.all|length }}</td>
+                    <td>{{ client.last_seen }}</td>
+                    <td>{{ client.last_ip }}</td>
+                    <td>{% if client.active %}Yes {% else %}No{% endif %}</td>
+                    <td>
+                        <a href="{% url 'collector_torrent_remove_client' torrent.id %}?client={{ client.id }}"
+                           class="btn btn-danger btn-mini"><i class="icon-white icon-remove-sign"></i> Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+        No clients assigned to this torrent
+    {% endif %}
+
+
+{% endblock %}
+

@@ -1,0 +1,83 @@
+[
+    {
+        "pk":1,
+        "model":"collector.client",
+        "fields":{
+            "active":true,
+            "description":"test client",
+            "key":"484a19fdfe37375617dda5364f01e7a477d41386"
+        }
+    },
+    {
+        "pk":1,
+        "model":"collector.torrent",
+        "fields":{
+            "active":true,
+            "date_added":"2013-02-01T18:45:02.926Z",
+            "magnet":"magnet:?xt=urn:btih:9323F615656D9CB21246051A7E2965E23AC69DBF&dn=Fedora+18+KDE+%5B64+bit%5D&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=http%3A%2F%2Fexodus.desync.com%2Fannounce",
+            "clients":[1],
+            "description":"fedora",
+            "info_hash":"9323f615656d9cb21246051a7e2965e23ac69dbf"
+        }
+    },
+    {
+        "pk":2,
+        "model":"collector.torrent",
+        "fields":{
+            "active":true,
+            "date_added":"2013-02-01T18:45:10.541Z",
+            "magnet":"magnet:?xt=urn:btih:F36C92A8F78A1AFF70A61A5F5BFE5E6757176133&dn=ubuntu+12+10+desktop+amd64&tr=http%3A%2F%2Ftorrent.ubuntu.com%3A6969%2Fannounce",
+            "clients":[1],
+            "description":"ubuntu",
+            "info_hash":"F36C92A8F78A1AFF70A61A5F5BFE5E6757176133"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "collector.torrent",
+        "fields": {
+            "description": "opensuse",
+            "clients":[1],
+            "info_hash": "1B17297B1C98637385A6786CF5CE536A6D2839FE",
+            "magnet": "magnet:?xt=urn:btih:1B17297B1C98637385A6786CF5CE536A6D2839FE&dn=opensuse+12+2+dvd+x86+64+iso&tr=udp%3A%2F%2Ffr33domtracker.h33t.com%3A3310%2Fannounce",
+            "active": true,
+            "date_added": "2013-02-04T20:04:10.532Z"
+        }
+    },
+    {
+        "pk":1,
+        "model":"collector.torrentmetadata",
+        "fields":{
+            "comment":"",
+            "files":null,
+            "name":null,
+            "creator":"",
+            "torrent":1,
+            "size":871367737
+        }
+    },
+    {
+        "pk":2,
+        "model":"collector.torrentmetadata",
+        "fields":{
+            "comment":"",
+            "files":null,
+            "name":null,
+            "creator":"",
+            "torrent":2,
+            "size":800063488
+        }
+    },
+    {
+        "pk": 3,
+        "model": "collector.torrentmetadata",
+        "fields": {
+            "comment": null,
+            "files": null,
+            "name": null,
+            "creator": null,
+            "torrent": 3,
+            "size": 0
+        }
+    }
+]

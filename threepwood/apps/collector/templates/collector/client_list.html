@@ -1,0 +1,55 @@
+{% extends "collector/collector.html" %}
+{% load url from future %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}uni_form/uni-form.css" type="text/css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}uni_form/default.uni-form.css" type="text/css"/>
+{% endblock css %}
+
+
+{% block controls %}
+
+{% endblock %}
+{% block collector %}
+
+
+    <h1>Clients     <a href="{% url 'collector_client_create' %}" class="btn btn-primary pull-right"><i class="icon-white icon-plus"></i>
+        Add client</a>
+    </h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Client Key</th>
+            <th>Description</th>
+            <th>Torrents</th>
+            <th>Last seen</th>
+            <th>Active</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for client in client_list %}
+            <tr data-id="{{ client.id }}">
+                <td>
+                    <a href="{% url "collector_client_detail" client.pk %}">{{ client.key }}</a>
+                </td>
+                <td>
+                    {{ client.description|truncatechars:32 }}
+                </td>
+                <td>{{ client.torrent_set.all|length }}</td>
+                <td>
+                    {{ client.last_seen }}
+                </td>
+                <td>
+                    {% if client.active %}Yes {% else %}No{% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'collector_client_delete' client.id %}" class="btn btn-danger btn-mini"><i class="icon-white icon-remove-sign"></i> Delete</a>
+
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

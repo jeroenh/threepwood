@@ -1,0 +1,81 @@
+{% extends 'collector/collector.html' %}
+{% load crispy_forms_tags %}
+{% load url from future %}
+
+{% block collector %}
+    <h1>Client
+    <div class="btn-group pull-right">
+        <a href="{% url 'collector_client_delete' client.id %}" class="btn btn-danger"><i class="icon-white icon-remove-sign"></i> Delete</a>
+        <a href="{% url 'collector_client_update' client.id %}" class="btn btn-info "><i class="icon-white icon-edit"></i> Edit</a>
+    </div>
+    </h1>
+
+
+    <p>
+        {{ client.description }}
+    </p>
+
+    <table class="table">
+        <thead>
+        <th>Client Key</th>
+        <th>Last seen</th>
+        <th>Last IP</th>
+        <th>Active</th>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+               {{ client.key }}
+            </td>
+
+            <td>
+                {{ client.last_seen }}
+            </td>
+
+            <td>
+                {{ client.last_ip }}
+            </td>
+
+            <td>
+                {% if client.active %}Yes {% else %}No{% endif %}
+            </td>
+        </tr>
+        </tbody>
+
+    </table>
+
+
+
+    <h3>Torrents ({{ client.torrent_set.all|length }})
+        <a href="{% url "collector_client_assign_torrents" client.pk %}" class="btn btn-primary pull-right"><i class="icon-white icon-plus"></i>
+            Assign torrent</a>
+    </h3>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Hash</th>
+            <th>Description</th>
+            <th>Active</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for torrent in client.torrent_set.all %}
+            <tr data-id="{{ torrent.id }}">
+                <td>
+                    <a href="{% url 'collector_torrent_detail' torrent.pk %}">{{ torrent.info_hash|truncatechars:42 }}</a>
+                </td>
+
+                <td>{{ torrent.description|truncatechars:32 }}</td>
+                <td>{% if torrent.active %}Yes {% else %}No{% endif %}</td>
+                <td>
+                    <a href="{% url 'collector_torrent_remove_client' torrent.id %}?client={{ client.id }}" class="btn btn-danger btn-mini"><i class="icon-white icon-remove-sign"></i> Remove</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+{% endblock %}
+

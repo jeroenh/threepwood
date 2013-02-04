@@ -1,0 +1,59 @@
+{% load url from future %}
+{% load i18n %}
+{% load site_tags %}
+
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Guybrush Threepwood!</title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/base.css"/>
+    {% block css %}{% endblock %}
+</head>
+<body>
+<!-- navbar -->
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            {% url 'home' as home %}
+            {% url 'collector' as collector %}
+            {% url 'reports' as reports %}
+
+            <a class="brand" href="#">Guybrush!</a>
+
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li class="{% active request home %}"><a href="{{ home }}"><i class="icon-home icon-white"></i> Home</a>
+                    </li>
+                    <li class="{% active request collector %}"><a href="{{ collector }}"><i class="icon-filter icon-white"></i> Collector</a>
+                    </li>
+                    <li class="{% active request reports %}"><a href="{{ reports }}"><i class="icon-briefcase icon-white"></i> Reports</a>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+
+<div class="container">
+            {% block container %}
+
+            {% endblock %}
+</div>
+
+
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+
+{% block js %}
+{% endblock %}
+
+</body>
+</html>
