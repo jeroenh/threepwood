@@ -335,7 +335,8 @@ def main():
                         torrent_threads[info_hash].active = False
                         torrent_threads[info_hash].new_session = True
                         torrent_threads[info_hash].session_key = response['session_key']
-
+                #sleep a bit not to overwhelm the server
+                time.sleep(1)
 
         #TODO print session status
 
@@ -350,8 +351,7 @@ def main():
 
             last_heartbeat = datetime.now()
 
-            #sleep a bit not to overwhelm the server
-            time.sleep(1)
+
             #add new torrents
 
             if response['success']:
