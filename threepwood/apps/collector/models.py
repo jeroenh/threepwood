@@ -81,6 +81,9 @@ class Torrent(models.Model):
     def distinct_peers(self):
         return PeerRecord.objects.filter(session__in=self.session_set.all()).values_list('ip', flat=True).distinct().count()
 
+    @property
+    def sorted_session_set(self):
+        return self.session_set.order_by('-date_created')
 
 class TorrentMetadata(models.Model):
     name = models.CharField(max_length=256, blank=True, null=True)
