@@ -13,15 +13,14 @@ import json
 
 __author__ = 'cdumitru'
 
-KEY = "484a19fdfe37375617dda5364f01e7a477d41386"
+KEY = "4611fba32d0321e33cb0a2cbbb8ec557b327c9b8"
 #KEY = "484a19fdfe37375617dda5364f01e7a477d41381"
 
 LOG_FILE = 'lechuck.log'
 LOG_LEVEL_CONSOLE = 'debug' # Options: debug, info, warning, error, critical
 LOG_LEVEL_FILE = 'debug' # Options: debug, info, warning, error, critical
-THREEPWOOD_POST_URL = "http://localhost:8000/collector/post_peers/"  #do not forget the trailing /
-THREEPWOOD_GET_URL = "http://localhost:8000/collector/get_torrents/?key=" + KEY
-
+THREEPWOOD_POST_URL = "http://apricot.studlab.os3.nl:8000/collector/post_peers/"  #do not forget the trailing /
+THREEPWOOD_GET_URL = "http://apricot.studlab.os3.nl:8000/collector/get_torrents/?key=" + KEY
 
 #TODO get these values from guybrush
 MAX_PEERS_THRESHOLD = 20
@@ -54,6 +53,7 @@ def request(type, url, data=None):
     while try_count < MAX_TRIES:
         try:
             if type == 'GET':
+                print url
                 response = requests.get(url)
             if type == 'POST':
                 response = requests.post(url, data=json_encoded_data)
@@ -62,7 +62,7 @@ def request(type, url, data=None):
                 logger.critical("Threepwood server error. Status code:{0}".format(response.status_code))
                 raise Exception('status code')
             if not response.json()['success']:
-                logger.critical("Threepwood service error: {0}".format(response.json()['message']))
+                logger.critical("Threepwood service error: {0}".format(str(response.json()['message'])))
                 raise Exception('failed')
 
             return response.json()

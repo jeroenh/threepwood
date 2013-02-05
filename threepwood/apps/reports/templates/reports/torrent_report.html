@@ -4,18 +4,26 @@
 
 {% block report %}
 
-    {{ torrent }}
 
-    <h2>Total distinct {{ torrent.distinct_peers }}</h2>
+    <h2>Metadata</h2>
+    <ul class="unstyled">
+        <li>{{ torrent.torrentmetadata.name }}</li>
+        <li>Total distinct peers {{ torrent.distinct_peers }}</li>
+    </ul>
+
+      <h2>Sessions({{ torrent.session_set.all|length }})</h2>
+
      <table class="table">
      <thead>
      <th>Created</th>
+     <th>Client</th>
      <th>Peer count</th>
      </thead>
      <tbody>
     {% for session in torrent.session_set.all %}
         <tr>
             <td>{{ session.date_created }}</td>
+            <td><a href="{% url 'collector_client_detail' session.client.pk %}">{{ session.client|truncatechars:32 }}</a></td>
             <td>{{ session.get_size }}</td>
         </tr>
     {% endfor %}
