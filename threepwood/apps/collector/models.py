@@ -18,7 +18,7 @@ def _generate_key():
 
 class Client(models.Model):
 
-    key = models.CharField(max_length=40, editable=False)
+    key = models.CharField(max_length=40, editable=False, db_index=True)
     description = models.CharField(max_length=1024, blank=True, null=True)
     active = models.BooleanField(default=True)
 
@@ -61,7 +61,7 @@ class Client(models.Model):
             return None
 
 class Torrent(models.Model):
-    info_hash = models.CharField(max_length=40)
+    info_hash = models.CharField(max_length=40, db_index=True)
     magnet = models.CharField(max_length=2048)
     clients = models.ManyToManyField(Client, null=True, blank=True)
     description = models.CharField(max_length=256)
@@ -108,7 +108,7 @@ class Session(models.Model):
 
     client = models.ForeignKey(Client)
     ip = models.GenericIPAddressField()
-    key = models.CharField(max_length=40, editable=False)
+    key = models.CharField(max_length=40, editable=False, db_index=True)
     date_created = models.DateTimeField(auto_now_add=True)
     torrent = models.ForeignKey(Torrent)
     version = models.CharField(max_length=32)
