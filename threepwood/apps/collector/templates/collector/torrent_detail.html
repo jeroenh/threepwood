@@ -86,7 +86,7 @@
             {% for client in torrent.clients.all %}
                 <tr data-id="{{ client.id }}">
                     <td>
-                        <a href="{% url "collector_client_detail" client.pk %}">{{ client.key|truncatechars:24 }}</a>
+                        <a href="{% url "collector_client_detail" client.pk %}">{{ client.key|truncatechars:12 }}</a>
                     </td>
                     <td>{{ client.description }}</td>
                     <td>{{ client.torrent_set.all|length }}</td>
