@@ -110,18 +110,21 @@ class Torrent(Thread):
         #        self.handle = self.libtorrent_session.add_torrent(info, './')
         self.handle = lt.add_magnet_uri(self.libtorrent_session, str(self.magnet),
             {'save_path': './',
-             'storage_mode': lt.storage_mode_t.storage_mode_sparse
+             'storage_mode': lt.storage_mode_t.storage_mode_sparse,
+             'paused':True
             })
 
+
+        print 'added'
 
         #wait for the download to start
         while not self.handle.status().state == self.handle.status().downloading:
             time.sleep(1)
         self.logger.debug("{0} changed state to  downloading".format(self.info_hash))
 
-        # Stop sharing data by setting priorities to 0
 
         #set all file prio to 0
+
         self.handle.prioritize_files([0 for i in self.handle.file_priorities()])
 
         #        for i in range(0, self.handle.get_torrent_info().num_pieces()):
@@ -222,7 +225,7 @@ def init_logger(config):
 
 
 
-def get_libtorrent_session():
+def get_libtorrent_session(config):
     logger = logging.getLogger("lechuck")
     logger.debug("Creating libtorrent session")
     session = lt.session()
@@ -234,12 +237,24 @@ def get_libtorrent_session():
     session.add_dht_router('router.utorrent.com', 6881)
     session.add_dht_router('router.bittorrent.com', 6881)
     session.start_dht()
+    session.set_download_rate_limit(int(config.get('global', 'download_rate')))
+    session.set_upload_rate_limit(int(config.get('global', 'upload_rate')))
 
     return session
 
 
 def main():
     global exit
+    #TODO support command line options
+    config_file = "lechuck.conf"
+
+    try:
+        config = ConfigParser.ConfigParser({'upload_rate': '32768', 'download_rate': '32768'})
+
+        config.read(config_file)
+    except:
+        print "Error reading config file {0}. Exiting".format(config_file)
+        sys.exit(0)
 
     settings= {
         'MAX_PEERS_THRESHOLD': 20,
@@ -250,20 +265,10 @@ def main():
 
 
     queue = Queue.Queue()
-    session = get_libtorrent_session()
+    session = get_libtorrent_session(config)
 
     signal.signal(signal.SIGINT, signal_handler)
 
-    #TODO support command line options
-    config_file = "lechuck.conf"
-
-    try:
-        config = ConfigParser.ConfigParser()
-
-        config.read(config_file)
-    except:
-        print "Error reading config file {0}. Exiting".format(config_file)
-        sys.exit(0)
 
     logger = init_logger(config)
 
@@ -334,6 +339,9 @@ def main():
                         torrent_threads[info_hash].new_session = True
                         torrent_threads[info_hash].session_key = response['session_key']
 
+
+        #TODO print session status
+
         #get fresh info
         if  datetime.now() - last_heartbeat > timedelta(
             seconds=settings['CHECK_FOR_UPDATES_INTERVAL']) and not exit:
@@ -379,6 +387,8 @@ def main():
     for info_hash in torrent_threads.keys():
         torrent_threads[info_hash].join()
     del session
+
+
     logger.info("Bye")
 
 if __name__ == "__main__":
