@@ -88,7 +88,7 @@ class TorrentMetadata(models.Model):
     comment = models.CharField(max_length=1500, blank=True,  null=True)
     creator = models.CharField(max_length=300, blank=True,  null=True)
     files = models.TextField(blank=True,  null=True)
-    size = models.IntegerField(default=0)
+    size = models.BigIntegerField(default=0)
     torrent = models.OneToOneField(Torrent)
     def files_as_list(self):
         print self.files

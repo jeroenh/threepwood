@@ -1,5 +1,5 @@
 *.sqlite
-utils/*.conf
-utils/*.log
+*.conf
+*.log
 *.pyc
 .idea
