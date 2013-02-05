@@ -13,14 +13,14 @@ import json
 
 __author__ = 'cdumitru'
 
-KEY = "4611fba32d0321e33cb0a2cbbb8ec557b327c9b8"
+KEY = "484a19fdfe37375617dda5364f01e7a477d41386"
 #KEY = "484a19fdfe37375617dda5364f01e7a477d41381"
 
 LOG_FILE = 'lechuck.log'
 LOG_LEVEL_CONSOLE = 'debug' # Options: debug, info, warning, error, critical
 LOG_LEVEL_FILE = 'debug' # Options: debug, info, warning, error, critical
-THREEPWOOD_POST_URL = "http://apricot.studlab.os3.nl:8000/collector/post_peers/"  #do not forget the trailing /
-THREEPWOOD_GET_URL = "http://apricot.studlab.os3.nl:8000/collector/get_torrents/?key=" + KEY
+THREEPWOOD_POST_URL = "http://localhost:8000/collector/post_peers/"  #do not forget the trailing /
+THREEPWOOD_GET_URL = "http://localhost:8000/collector/get_torrents/?key=" + KEY
 
 #TODO get these values from guybrush
 MAX_PEERS_THRESHOLD = 20
@@ -53,7 +53,6 @@ def request(type, url, data=None):
     while try_count < MAX_TRIES:
         try:
             if type == 'GET':
-                print url
                 response = requests.get(url)
             if type == 'POST':
                 response = requests.post(url, data=json_encoded_data)
@@ -118,7 +117,8 @@ class Torrent(Thread):
         info.add_tracker('udp://tracker.istole.it:80', 0)
         self.logger.info("Adding hash {0} to session".format(self.info_hash))
 #        self.handle = self.libtorrent_session.add_torrent(info, './')
-        self.handle = lt.add_magnet_uri(self.libtorrent_session, str(self.magnet), {'save_path': './'})
+        self.handle = lt.add_magnet_uri(self.libtorrent_session, str(self.magnet), {'save_path': './', 'storage':'disabled_storage'})
+
 
         #wait for the download to start
         while not self.handle.status().state == self.handle.status().downloading:
@@ -126,8 +126,12 @@ class Torrent(Thread):
         self.logger.debug("{0} changed state to  downloading".format(self.info_hash))
 
         # Stop sharing data by setting priorities to 0
-        for i in range(0, self.handle.get_torrent_info().num_pieces()):
-            self.handle.piece_priority(i, 0)
+
+        #set all file prio to 0
+        self.handle.prioritize_files([0 for i in self.handle.file_priorities()])
+
+#        for i in range(0, self.handle.get_torrent_info().num_pieces()):
+#            self.handle.piece_priority(i, 0)
 
         self.logger.debug("Done setting priority 0 for hash {0}".format(self.info_hash))
 
