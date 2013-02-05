@@ -269,7 +269,7 @@ def main():
 
     logger = init_logger(config)
 
-    get_url = config.get('global', 'THREEPWOOD_GET_URL') + config.get('global', 'KEY')
+    get_url = config.get('global', 'THREEPWOOD_GET_URL') + "?key="+ config.get('global', 'KEY') + "&version=libtorrent-"+lt.version
     post_url = config.get('global', 'THREEPWOOD_POST_URL')
 
     torrent_list = []

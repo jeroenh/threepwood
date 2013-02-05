@@ -152,7 +152,7 @@ def post_peers(request):
     return http.HttpResponse(content=dumps(res), mimetype='application/json')
 
 
-def get_sessions_and_torrents_for_client(client, ip):
+def get_sessions_and_torrents_for_client(client, ip, version):
     result = []
     hashes = list(client.torrent_set.filter(active=True).values_list('info_hash', flat=True))
 
@@ -164,7 +164,7 @@ def get_sessions_and_torrents_for_client(client, ip):
                 raise  ObjectDoesNotExist
         except ObjectDoesNotExist:
             torrent = Torrent.objects.get(info_hash=hash)
-            session = Session(client=client, ip=ip, torrent=torrent)
+            session = Session(client=client, ip=ip, torrent=torrent, version=version)
             session.save()
         result.append({'session_key': session.key,
                        'info_hash': session.torrent.info_hash,
@@ -188,6 +188,7 @@ def get_torrents(request):
     ip = get_ip(request)
     if request.method == "GET":
         key = request.GET.get('key',"")
+        version = request.GET.get('version',"")
         try:
             client = Client.objects.get(key=key)
 
@@ -195,7 +196,7 @@ def get_torrents(request):
                 res['message'] = "Client not active"
                 return http.HttpResponse(content=dumps(res), mimetype='application/json')
 
-            res['torrents'] = get_sessions_and_torrents_for_client(client, ip)
+            res['torrents'] = get_sessions_and_torrents_for_client(client, ip, version)
             res['success'] = 'true'
         except ObjectDoesNotExist:
             res['message'] = "Unknown client"

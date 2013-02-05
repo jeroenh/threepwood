@@ -20,6 +20,7 @@ class Client(models.Model):
     description = models.CharField(max_length=1024, blank=True, null=True)
     active = models.BooleanField(default=True)
 
+
     def __unicode__(self):
         return u"{0}".format(self.key)
 
@@ -101,6 +102,7 @@ class Session(models.Model):
     key = models.CharField(max_length=40, editable=False)
     date_created = models.DateTimeField(auto_now_add=True)
     torrent = models.ForeignKey(Torrent)
+    version = models.CharField(max_length=32)
 
 
     def is_active(self):
