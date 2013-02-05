@@ -114,9 +114,6 @@ class Torrent(Thread):
              'paused':True
             })
 
-
-        print 'added'
-
         #wait for the download to start
         while not self.handle.status().state == self.handle.status().downloading:
             time.sleep(1)
