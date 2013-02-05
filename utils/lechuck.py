@@ -109,7 +109,7 @@ class Torrent(Thread):
         self.logger.info("Adding hash {0} to session".format(self.info_hash))
         #        self.handle = self.libtorrent_session.add_torrent(info, './')
         self.handle = lt.add_magnet_uri(self.libtorrent_session, str(self.magnet),
-            {'save_path': './',
+            {'save_path': '/tmp',
              'storage_mode': lt.storage_mode_t.storage_mode_sparse,
              'paused':True
             })
