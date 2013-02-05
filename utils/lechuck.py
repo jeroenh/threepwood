@@ -172,8 +172,9 @@ class Torrent(Thread):
 
     def cleanup(self):
         self.logger.debug("Removing torrent {0}".format(self.name))
-        self.libtorrent_session.remove_torrent(self.handle)
+        self.libtorrent_session.remove_torrent(self.handle, 1)
         time.sleep(5)
+
 
     def run(self):
         self.logger.debug("Started thread for hash {0}".format(self.info_hash))
