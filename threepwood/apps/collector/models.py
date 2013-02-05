@@ -33,8 +33,7 @@ class Client(models.Model):
         super(Client, self).save(*args, **kwargs)
 
     def get_active_session(self, torrent):
-
-        sessions = torrent.session_set.all().order_by("-date_created")
+        sessions = self.session_set.filter(torrent=torrent).order_by("-date_created")
         if sessions.count() > 0 and now() - sessions[0].date_created < timedelta(seconds=Session.LIFETIME):
             return  sessions[0]
         else:
