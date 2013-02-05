@@ -3,3 +3,4 @@
 *.log
 *.pyc
 .idea
+local_settings.py
