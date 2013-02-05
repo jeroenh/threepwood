@@ -1,11 +1,9 @@
-from datetime import timedelta, datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.utils.simplejson import dumps, loads
-from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 from threepwood.apps.collector.forms import TorrentForm, ClientCreateForm, ClientUpdateForm, TorrentAddClientForm, ConfirmDelete, TorrentRemoveClientForm, TorrentUpdateForm, ClientAddTorrentForm
 from threepwood.apps.collector.models import Client, Torrent, PeerRecord, Session, RawPeerRecord
@@ -102,8 +100,6 @@ def post_peers(request):
 
         try:
             session = Session.objects.get(key=data['session_key'])
-            #for now we just pass back the same session key
-            res['session_key'] = data['session_key']
 
         except ObjectDoesNotExist:
             res['message'] = "Invalid session"
@@ -144,10 +140,11 @@ def post_peers(request):
 
         #this will create a new session every max_liftime seconds
         #this creates some stress on the db. maybe the client should get a new session only via GET ?
-        if not session.client.get_active_session(session.torrent) != session:
-                new_session = Session(client=session.client, ip=ip, torrent = session.torrent, version = session.version)
-                new_session.save()
-                res['session_key'] = new_session.key
+        if session.client.get_active_session(session.torrent) != session:
+            session = Session(client=session.client, ip=ip, torrent = session.torrent, version = session.version)
+            session.save()
+
+        res['session_key'] = session.key
 
     return http.HttpResponse(content=dumps(res), mimetype='application/json')
 
