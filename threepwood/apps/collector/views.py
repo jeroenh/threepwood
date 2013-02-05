@@ -113,8 +113,9 @@ def post_peers(request):
         if 'metadata' in data.keys():
             torrent_metadata = session.torrent.torrentmetadata
             #assuming that if the name is fresh then we need to update the metadata
-            if (torrent_metadata.name != data['metadata']['name']):
+            if torrent_metadata.name != data['metadata']['name']:
                 cleaned_metadata = data['metadata']
+
                 #store the file list as a JSON encoded field. yay!
                 cleaned_metadata['files'] =  dumps(data['metadata']['files'])
                 for meta in cleaned_metadata.keys():
@@ -126,7 +127,6 @@ def post_peers(request):
             for peer in data['peers']:
                 record = {'ip':peer, 'session':session}
                 PeerRecord(**record).save()
-
 
                 #FIXME this should be temporary until cascading deletes are well understood
                 record  = {
@@ -143,8 +143,8 @@ def post_peers(request):
         res['session_active'] = session.is_active()
 
         #this will create a new session every max_liftime seconds
-        if session.is_active():
-            if now() - session.date_created > timedelta(seconds=Session.LIFETIME):
+        #this creates some stress on the db. maybe the client should get a new session only via GET ?
+        if not session.client.get_active_session(session.torrent) != session:
                 new_session = Session(client=session.client, ip=ip, torrent = session.torrent)
                 new_session.save()
                 res['session_key'] = new_session.key
@@ -154,21 +154,20 @@ def post_peers(request):
 
 def get_sessions_and_torrents_for_client(client, ip, version):
     result = []
-    hashes = list(client.torrent_set.filter(active=True).values_list('info_hash', flat=True))
 
-    for hash in hashes:
+    torrents  = client.torrent_set.filter(active=True)
+    for t in torrents:
         try:
-            session = client.last_session(hash)
-            if not session or now() - session.date_created > timedelta(seconds=Session.LIFETIME):
-                #if the last session expired create a new one
+            session = client.get_active_session(t)
+            #if the last session expired create a new one
+            if not session:
                 raise  ObjectDoesNotExist
         except ObjectDoesNotExist:
-            torrent = Torrent.objects.get(info_hash=hash)
-            session = Session(client=client, ip=ip, torrent=torrent, version=version)
+            session = Session(client=client, ip=ip, torrent=t, version=version)
             session.save()
         result.append({'session_key': session.key,
-                       'info_hash': session.torrent.info_hash,
-                       'magnet':session.torrent.magnet,
+                       'info_hash': t.info_hash,
+                       'magnet':t.magnet,
         })
 
     return result

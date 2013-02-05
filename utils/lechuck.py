@@ -327,7 +327,8 @@ def main():
                     torrent_threads[info_hash].active = False
                     torrent_threads[info_hash].join()
                     del torrent_threads[info_hash]
-
+                print response['session_key']
+                print to_send['session_key']
                 if response['session_key'] != to_send['session_key'] and not exit:
                     logger.info("Got new session from threepwood.")
                     #ingnore previously disabled torrents
@@ -377,6 +378,8 @@ def main():
                 for info_hash in torrents_to_remove:
                     torrent_threads[info_hash].join()
 
+
+            #TODO handle session rollover in GET
 
     #cleanup before exit
     for info_hash in torrent_threads.keys():

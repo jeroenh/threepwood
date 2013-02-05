@@ -1,9 +1,11 @@
+from datetime import timedelta
 import hashlib
 import uuid
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.simplejson import loads
+from django.utils.timezone import now
 
 def _generate_key():
     """
@@ -30,16 +32,24 @@ class Client(models.Model):
 
         super(Client, self).save(*args, **kwargs)
 
-    def last_session(self, hash):
-        sessions = [session for session in self.session_set.filter(torrent__info_hash=hash).order_by('-date_created')]
-        if len(sessions) > 0:
+    def get_active_session(self, torrent):
+
+        sessions = torrent.session_set.all().order_by("-date_created")
+        if sessions.count() > 0 and now() - sessions[0].date_created < timedelta(seconds=Session.LIFETIME):
+            return  sessions[0]
+        else:
+            return None
+
+    def last_session(self, torrent):
+        sessions = torrent.session_set.all().order_by("-date_created")
+        if sessions.count() > 0:
             return sessions[0]
         else:
             return None
 
     def last_seen(self):
         sessions = self.session_set.all().order_by('-date_created')
-        if len(sessions)>0:
+        if sessions.count()>0:
             return sessions[0].date_created
         else:
             return None
@@ -95,7 +105,7 @@ def create_metadata(sender, instance, created, **kwargs):
 
 class Session(models.Model):
 
-    LIFETIME = 3600
+    LIFETIME = 60
 
     client = models.ForeignKey(Client)
     ip = models.GenericIPAddressField()
