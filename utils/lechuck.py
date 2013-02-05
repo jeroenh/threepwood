@@ -362,7 +362,7 @@ def main():
                 for t in torrents_to_add:
                     info_hash = t['info_hash']
                     logger.info("Adding torrent {0}".format(info_hash))
-                    torrent_threads[info_hash] = Torrent(session, t, queue)
+                    torrent_threads[info_hash] = Torrent(session, t,settings, queue)
                     torrent_threads[info_hash].daemon = True
                     torrent_threads[info_hash].start()
                 for info_hash in torrents_to_remove:
