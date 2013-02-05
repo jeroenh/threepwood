@@ -46,7 +46,6 @@ def request(type, url, data=None):
             if type == 'GET':
                 response = requests.get(url)
             if type == 'POST':
-                print json_encoded_data
                 response = requests.post(url, data=json_encoded_data)
 
             if response.status_code != 200:
@@ -338,7 +337,7 @@ def main():
                         torrent_threads[info_hash].new_session = True
                         torrent_threads[info_hash].session_key = response['session_key']
                 #sleep a bit not to overwhelm the server
-                time.sleep(1)
+            time.sleep(2)
 
         #TODO print session status
 
