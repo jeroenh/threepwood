@@ -327,8 +327,7 @@ def main():
                     torrent_threads[info_hash].active = False
                     torrent_threads[info_hash].join()
                     del torrent_threads[info_hash]
-                print response['session_key']
-                print to_send['session_key']
+
                 if response['session_key'] != to_send['session_key'] and not exit:
                     logger.info("Got new session from threepwood.")
                     #ingnore previously disabled torrents

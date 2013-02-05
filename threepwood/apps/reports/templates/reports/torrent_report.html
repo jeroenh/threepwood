@@ -17,6 +17,7 @@
      <thead>
      <th>Created</th>
      <th>Client</th>
+     <th>Client Version</th>
      <th>Peer count</th>
      </thead>
      <tbody>
@@ -24,6 +25,7 @@
         <tr>
             <td>{{ session.date_created }}</td>
             <td><a href="{% url 'collector_client_detail' session.client.pk %}">{{ session.client|truncatechars:32 }}</a></td>
+            <td>{{ session.version }}</td>
             <td>{{ session.get_size }}</td>
         </tr>
     {% endfor %}

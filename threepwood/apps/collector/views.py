@@ -145,7 +145,7 @@ def post_peers(request):
         #this will create a new session every max_liftime seconds
         #this creates some stress on the db. maybe the client should get a new session only via GET ?
         if not session.client.get_active_session(session.torrent) != session:
-                new_session = Session(client=session.client, ip=ip, torrent = session.torrent)
+                new_session = Session(client=session.client, ip=ip, torrent = session.torrent, version = session.version)
                 new_session.save()
                 res['session_key'] = new_session.key
 
