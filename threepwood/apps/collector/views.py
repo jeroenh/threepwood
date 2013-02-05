@@ -154,12 +154,9 @@ def get_sessions_and_torrents_for_client(client, ip, version):
 
     torrents  = client.torrent_set.filter(active=True)
     for t in torrents:
-        try:
-            session = client.get_active_session(t)
-            #if the last session expired create a new one
-            if not session:
-                raise  ObjectDoesNotExist
-        except ObjectDoesNotExist:
+        session = client.get_active_session(t)
+        #if the last session expired create a new one
+        if not session:
             session = Session(client=client, ip=ip, torrent=t, version=version)
             session.save()
         result.append({'session_key': session.key,
