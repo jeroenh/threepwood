@@ -333,11 +333,13 @@ def main():
                     logger.info("Got new session from threepwood.")
                     #ingnore previously disabled torrents
                     if torrent_threads[info_hash].active:
+                        torrent_threads[info_hash].session_key = response['session_key']
                         torrent_threads[info_hash].active = False
                         torrent_threads[info_hash].new_session = True
-                        torrent_threads[info_hash].session_key = response['session_key']
+
+                time.sleep(2)
                 #sleep a bit not to overwhelm the server
-            time.sleep(2)
+
 
         #TODO print session status
 
@@ -351,7 +353,6 @@ def main():
                 settings = response['settings']
 
             last_heartbeat = datetime.now()
-
 
             #add new torrents
 
@@ -378,6 +379,7 @@ def main():
                 for info_hash in torrents_to_remove:
                     torrent_threads[info_hash].join()
 
+                time.sleep(2)
 
             #TODO handle session rollover in GET
 
