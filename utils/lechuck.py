@@ -238,6 +238,15 @@ def get_libtorrent_session():
 
 def main():
     global exit
+
+    settings= {
+        'MAX_PEERS_THRESHOLD': 20,
+        'REPORT_INTERVAL': 60,
+        'CHECK_FOR_UPDATES_INTERVAL': 60
+    }
+
+
+
     queue = Queue.Queue()
     session = get_libtorrent_session()
 
@@ -268,8 +277,8 @@ def main():
         torrent_list = response['torrents']
 
     torrent_threads = {}
-
-    settings = response['settings']
+    if response.has_key('settings'):
+        settings = response['settings']
     for torrent in torrent_list:
         info_hash = torrent['info_hash']
         torrent_threads[info_hash] = Torrent(session, torrent,settings, queue)
