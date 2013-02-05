@@ -46,6 +46,7 @@ def request(type, url, data=None):
             if type == 'GET':
                 response = requests.get(url)
             if type == 'POST':
+                print json_encoded_data
                 response = requests.post(url, data=json_encoded_data)
 
             if response.status_code != 200:
