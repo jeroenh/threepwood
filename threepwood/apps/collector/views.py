@@ -1,5 +1,3 @@
-#!
-
 from datetime import timedelta, datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
@@ -11,6 +9,7 @@ from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 from threepwood.apps.collector.forms import TorrentForm, ClientCreateForm, ClientUpdateForm, TorrentAddClientForm, ConfirmDelete, TorrentRemoveClientForm, TorrentUpdateForm, ClientAddTorrentForm
 from threepwood.apps.collector.models import Client, Torrent, PeerRecord, Session, RawPeerRecord
+from threepwood.settings.base import MAX_PEERS_THRESHOLD, REPORT_INTERVAL, CHECK_FOR_UPDATES_INTERVAL
 
 __author__ = 'cdumitru'
 
@@ -167,13 +166,25 @@ def get_sessions_and_torrents_for_client(client, ip):
             torrent = Torrent.objects.get(info_hash=hash)
             session = Session(client=client, ip=ip, torrent=torrent)
             session.save()
-        result.append({'session_key': session.key, 'info_hash': session.torrent.info_hash, 'magnet':session.torrent.magnet})
+        result.append({'session_key': session.key,
+                       'info_hash': session.torrent.info_hash,
+                       'magnet':session.torrent.magnet,
+        })
 
     return result
 
 
 def get_torrents(request):
-    res = {'success':'false', 'torrents':[]}
+
+    #TODO get magic values from db
+    res = {'success':'false',
+           'torrents':[],
+            'settings':{
+            'MAX_PEERS_THRESHOLD': MAX_PEERS_THRESHOLD,
+            'REPORT_INTERVAL': REPORT_INTERVAL,
+            'CHECK_FOR_UPDATES_INTERVAL': CHECK_FOR_UPDATES_INTERVAL
+            }
+    }
     ip = get_ip(request)
     if request.method == "GET":
         key = request.GET.get('key',"")

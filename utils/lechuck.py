@@ -10,24 +10,15 @@ from datetime import datetime, timedelta
 import logging
 import requests
 import json
+import ConfigParser
+import sys
 
 __author__ = 'cdumitru'
 
-KEY = "484a19fdfe37375617dda5364f01e7a477d41386"
-#KEY = "484a19fdfe37375617dda5364f01e7a477d41381"
-
-LOG_FILE = 'lechuck.log'
-LOG_LEVEL_CONSOLE = 'debug' # Options: debug, info, warning, error, critical
-LOG_LEVEL_FILE = 'debug' # Options: debug, info, warning, error, critical
-THREEPWOOD_POST_URL = "http://localhost:8000/collector/post_peers/"  #do not forget the trailing /
-THREEPWOOD_GET_URL = "http://localhost:8000/collector/get_torrents/?key=" + KEY
-
-#TODO get these values from guybrush
-MAX_PEERS_THRESHOLD = 20
-REPORT_INTERVAL = 60
+#number of tries for http requests before giving up
 MAX_TRIES = 5
+#lechuck will block on the result queue for QUEUE_TIMEOUT seconds
 QUEUE_TIMEOUT = 10
-CHECK_FOR_UPDATES_INTERVAL = 60
 
 #when true lechuck walks the plank
 exit = False
@@ -90,13 +81,13 @@ class DateTimeJSONEncoder(json.JSONEncoder):
 
 
 class Torrent(Thread):
-    def __init__(self, libtorrent_session, torrent, queue):
+    def __init__(self, libtorrent_session, torrent,settings, queue):
         Thread.__init__(self)
         self.libtorrent_session = libtorrent_session
         self.session_key = torrent['session_key']
         self.magnet = torrent['magnet']
         self.info_hash = torrent['info_hash']
-
+        self.settings = settings
         self.logger = logging.getLogger("lechuck")
         self.peers = {}
         self.new_peers = []
@@ -116,8 +107,9 @@ class Torrent(Thread):
         info.add_tracker('udp://tracker.ccc.de:80', 0)
         info.add_tracker('udp://tracker.istole.it:80', 0)
         self.logger.info("Adding hash {0} to session".format(self.info_hash))
-#        self.handle = self.libtorrent_session.add_torrent(info, './')
-        self.handle = lt.add_magnet_uri(self.libtorrent_session, str(self.magnet), {'save_path': './', 'storage':'disabled_storage'})
+        #        self.handle = self.libtorrent_session.add_torrent(info, './')
+        self.handle = lt.add_magnet_uri(self.libtorrent_session, str(self.magnet),
+            {'save_path': './', 'storage': 'disabled_storage'})
 
 
         #wait for the download to start
@@ -130,8 +122,8 @@ class Torrent(Thread):
         #set all file prio to 0
         self.handle.prioritize_files([0 for i in self.handle.file_priorities()])
 
-#        for i in range(0, self.handle.get_torrent_info().num_pieces()):
-#            self.handle.piece_priority(i, 0)
+        #        for i in range(0, self.handle.get_torrent_info().num_pieces()):
+        #            self.handle.piece_priority(i, 0)
 
         self.logger.debug("Done setting priority 0 for hash {0}".format(self.info_hash))
 
@@ -166,15 +158,15 @@ class Torrent(Thread):
                 self.active = False
                 return
 
-            if (datetime.now() - last_report > timedelta(seconds=REPORT_INTERVAL) or\
-                len(self.new_peers) > MAX_PEERS_THRESHOLD) and len(self.new_peers) > 0:
+            if (datetime.now() - last_report > timedelta(seconds=self.settings['REPORT_INTERVAL']) or\
+                len(self.new_peers) > self.settings['MAX_PEERS_THRESHOLD']) and len(self.new_peers) > 0:
                 self.logger.debug("{0}: reporting {1} new peers".format(self.metadata['name'], len(self.new_peers)))
                 last_report = datetime.now()
                 self.send_peers(self.new_peers)
                 self.new_peers = []
             time.sleep(5)
 
-        #            self.logger.debug("{0}: total peers {1}".format(self.metadata['name'], len(self.peers.keys())))
+            #            self.logger.debug("{0}: total peers {1}".format(self.metadata['name'], len(self.peers.keys())))
 
     def cleanup(self):
         self.logger.debug("Removing torrent {0}".format(self.name))
@@ -194,7 +186,7 @@ class Torrent(Thread):
             self.cleanup()
 
 
-def init_logger():
+def init_logger(config):
     """
         Initializes and returns a logger object
     """
@@ -204,13 +196,19 @@ def init_logger():
               'error': logging.ERROR,
               'critical': logging.CRITICAL}
 
+    logfile = config.get('global', 'LOG_FILE')
+    loglevel_console = config.get('global', 'LOG_LEVEL_CONSOLE')
+    loglevel_file = config.get('global', 'LOG_LEVEL_FILE')
+
+
+
     logger = logging.getLogger("lechuck")
     logger.setLevel(logging.DEBUG)
-    fh = TimedRotatingFileHandler(LOG_FILE, when='D', interval=1,
+    fh = TimedRotatingFileHandler(logfile, when='D', interval=1,
         backupCount=5)
-    fh.setLevel(LEVELS[LOG_LEVEL_FILE])
+    fh.setLevel(LEVELS[loglevel_file])
     ch = logging.StreamHandler()
-    ch.setLevel(LEVELS[LOG_LEVEL_CONSOLE])
+    ch.setLevel(LEVELS[loglevel_console])
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - " +
                                   "%(message)s")
     fh.setFormatter(formatter)
@@ -220,15 +218,6 @@ def init_logger():
     return logger
 
 
-def get_torrents():
-    response = request('GET', THREEPWOOD_GET_URL)
-    if not response['success']:
-        response['torrents'] = []
-    return response
-
-
-def post_torrents(to_send):
-    return request('POST', THREEPWOOD_POST_URL, data=to_send)
 
 
 def get_libtorrent_session():
@@ -250,25 +239,40 @@ def get_libtorrent_session():
 def main():
     global exit
     queue = Queue.Queue()
-    logger = init_logger()
     session = get_libtorrent_session()
 
     signal.signal(signal.SIGINT, signal_handler)
 
-    #get the batch of torrents
+    #TODO support command line options
+    config_file = "lechuck.conf"
+
+    try:
+        config = ConfigParser.ConfigParser()
+
+        config.read(config_file)
+    except:
+        print "Error reading config file {0}. Exiting".format(config_file)
+        sys.exit(0)
+
+    logger = init_logger(config)
+
+    get_url = config.get('global', 'THREEPWOOD_GET_URL') + config.get('global', 'KEY')
+    post_url = config.get('global', 'THREEPWOOD_POST_URL')
+
     torrent_list = []
 
     last_heartbeat = datetime.now()
-    response = get_torrents()
+    response = request('GET', get_url)
 
     if response['success']:
         torrent_list = response['torrents']
 
     torrent_threads = {}
 
+    settings = response['settings']
     for torrent in torrent_list:
         info_hash = torrent['info_hash']
-        torrent_threads[info_hash] = Torrent(session, torrent, queue)
+        torrent_threads[info_hash] = Torrent(session, torrent,settings, queue)
         torrent_threads[info_hash].daemon = True
         torrent_threads[info_hash].start()
 
@@ -278,13 +282,15 @@ def main():
         try:
             result = queue.get(timeout=QUEUE_TIMEOUT)
         except Queue.Empty:
-            #check for dead threads
-            for key in torrent_threads.keys():
-                if not torrent_threads[key].active:
-                    logger.warning("Thread {0} is dead. Reaping! ".format(torrent))
-                    old_thread = torrent_threads[torrent]
-                    torrent_threads[torrent] = Torrent(session, torrent_threads[torrent]['session_key'], torrent, queue)
-                    old_thread.join()
+            pass
+            #check for dead threads TODO
+#            for key in torrent_threads.keys():
+#                if not torrent_threads[key].active:
+#                    logger.warning("Thread {0} is dead. Reaping! ".format(torrent_threads[key]))
+#                    old_thread = torrent_threads[torrent]
+##                    settings = torrent_threads[torrent]
+#                    torrent_threads[torrent] = Torrent(session, torrent, queue)
+#                    old_thread.join()
 
         if result:
             #if we got something from the queue  send it to threepwood
@@ -294,7 +300,7 @@ def main():
             to_send['session_key'] = torrent_threads[info_hash].session_key
             logger.debug("Reporting {0} peers from {1}".format(len(to_send['peers']), to_send['metadata']['name']))
 
-            response = post_torrents(to_send)
+            response = request('POST', post_url, data=to_send)
 
             #only perform actions if the message is well formed
             if response['success']:
@@ -318,14 +324,21 @@ def main():
                         torrent_threads[info_hash].session_key = response['session_key']
 
         #get fresh info
-        if  datetime.now() - last_heartbeat > timedelta(seconds=CHECK_FOR_UPDATES_INTERVAL) and not exit:
+        if  datetime.now() - last_heartbeat > timedelta(
+            seconds=settings['CHECK_FOR_UPDATES_INTERVAL']) and not exit:
             logger.debug("Getting fresh info from threepwood")
-            response = get_torrents()
+            response = request('GET', get_url)
+
+            if response.has_key('settings'):
+                settings = response['settings']
+
             last_heartbeat = datetime.now()
+
+            #sleep a bit not to overwhelm the server
+            time.sleep(1)
             #add new torrents
 
             if response['success']:
-
                 #the response is a list of dicts each having keyes info_hash and session
                 torrent_list = response['torrents']
                 #select only those torrent ids that are not already under the control of lechuck

@@ -121,3 +121,9 @@ LOGGING = {
         },
     }
 }
+
+
+#Threepwood settings - TODO get from database ...
+MAX_PEERS_THRESHOLD = 20
+REPORT_INTERVAL = 60
+CHECK_FOR_UPDATES_INTERVAL = 60

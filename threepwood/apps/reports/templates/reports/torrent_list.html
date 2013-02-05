@@ -1,0 +1,37 @@
+{% extends 'reports/reports.html' %}
+{% load crispy_forms_tags %}
+{% load url from future %}
+
+{% block report %}
+
+
+    <h2>Torrent Stats</h2>
+
+    <table class="table table-striped">
+        <thead><tr>
+            <th>Added</th>
+            <th>Info Hash</th>
+            <th>Description</th>
+            <th>Name</th>
+        </tr></thead>
+        <tbody>
+        {% for torrent in torrent_list %}
+            <tr data-id="{{ torrent.id }}">
+                <td>{{ torrent.date_added|date:'d-m-Y H:m:s' }}</td>
+                <td>
+                    <a href="{% url 'reports_torrent_report' torrent.pk %}"> {{ torrent.info_hash|truncatechars:24 }} </a>
+                </td>
+                <td>
+                    {{ torrent.description|truncatechars:32 }}
+                </td>
+                <td>
+                    {{ torrent.torrentmetadata.name }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+
+{% endblock%}

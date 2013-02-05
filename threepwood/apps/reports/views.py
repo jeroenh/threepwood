@@ -1,10 +1,21 @@
 # Create your views here.
-from django.views.generic import TemplateView, DetailView
-from threepwood.apps.collector.models import Torrent, PeerRecord
+from django.views.generic import TemplateView, DetailView, ListView
+from threepwood.apps.collector.models import Torrent, PeerRecord, Client
 
 class ClientReport(TemplateView):
     template_name = "reports/client_report.html"
 
+
+class ClientReportList(ListView):
+    queryset = Client.objects.all()
+    context_object_name = "client_list"
+    template_name = "reports/client_list.html"
+
+
+class TorrentReportList(ListView):
+    queryset = Torrent.objects.all()
+    context_object_name = "torrent_list"
+    template_name = "reports/torrent_list.html"
 
 class TorrentReport(DetailView):
     model = Torrent
