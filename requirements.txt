@@ -1,4 +1,9 @@
+# for threepwood
+mysql-python
 django
 django-tastypie
 django-crispy-forms
+
+
+# for lechuck
 requests
