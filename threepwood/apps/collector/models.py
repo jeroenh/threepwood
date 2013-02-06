@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.simplejson import loads
 from django.utils.timezone import now
-
+1
 def _generate_key():
     """
     @return: generates uuid
