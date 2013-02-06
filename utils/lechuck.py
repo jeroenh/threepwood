@@ -44,9 +44,9 @@ def request(type, url, data=None):
     while try_count < MAX_TRIES:
         try:
             if type == 'GET':
-                response = requests.get(url)
+                response = requests.get(url,verify=False)
             if type == 'POST':
-                response = requests.post(url, data=json_encoded_data)
+                response = requests.post(url, data=json_encoded_data,verify=False)
 
             if response.status_code != 200:
                 logger.critical("Threepwood server error. Status code:{0}".format(response.status_code))

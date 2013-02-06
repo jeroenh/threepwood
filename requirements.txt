@@ -1,6 +1,10 @@
+# for threepwood
 distribute>=0.6.28
+mysql-python
 django
 django-tastypie
 django-crispy-forms
+
+
+# for lechuck
 requests
-fabric
