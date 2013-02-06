@@ -1,5 +1,5 @@
 # for threepwood
-distribute>=0.6.28
+distribute==0.6.34
 mysql-python
 django
 django-tastypie
