@@ -22,7 +22,7 @@
         {% for torrent in torrent_list %}
             <tr data-id="{{ torrent.id }}">
                 <td>{{ torrent.date_added|date:'d-m-Y H:m:s' }}</td>
-                <td><a href="{% url 'collector_torrent_detail' torrent.pk %}"> {% if torrent.torrentmetadata.name %}{{torrent.torrentmetadata.name|truncatechars:24}} {% else %}{{ torrent.info_hash|truncatechars:24}}{% endif %}{{  }}</td>
+                <td><a href="{% url 'collector_torrent_detail' torrent.pk %}"> {% if torrent.torrentmetadata.name %}{{torrent.torrentmetadata.name|truncatechars:24}} {% else %}{{ torrent.info_hash|truncatechars:24}}{% endif %}</td>
                 <td>
                     {{ torrent.description|truncatechars:32 }}
                 </td>
