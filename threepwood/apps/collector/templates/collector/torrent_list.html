@@ -12,6 +12,7 @@
     <table class="table table-striped">
         <thead><tr>
             <th>Added</th>
+            <th>Name</th>
             <th>Info Hash</th>
             <th>Description</th>
             <th>Clients</th>
@@ -22,6 +23,7 @@
         {% for torrent in torrent_list %}
             <tr data-id="{{ torrent.id }}">
                 <td>{{ torrent.date_added|date:'d-m-Y H:m:s' }}</td>
+                <td>{{ torrent.torrentmetadata.name }}</td>
                 <td>
                     <a href="{% url 'collector_torrent_detail' torrent.pk %}"> {{ torrent.info_hash|truncatechars:24 }} </a>
                 </td>
