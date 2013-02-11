@@ -260,24 +260,16 @@ def main():
         'CHECK_FOR_UPDATES_INTERVAL': 60
     }
 
-
-
     queue = Queue.Queue()
     session = get_libtorrent_session(config)
-
     signal.signal(signal.SIGINT, signal_handler)
-
-
     logger = init_logger(config)
-
     get_url = config.get('global', 'THREEPWOOD_GET_URL') + "?key="+ config.get('global', 'KEY') + "&version=libtorrent-"+lt.version
     post_url = config.get('global', 'THREEPWOOD_POST_URL')
-
     torrent_list = []
-
     last_heartbeat = datetime.now()
-    response = request('GET', get_url)
 
+    response = request('GET', get_url)
     if response['success']:
         torrent_list = response['torrents']
 
