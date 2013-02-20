@@ -149,3 +149,13 @@ class RawPeerRecord(models.Model):
     client_ip = models.GenericIPAddressField()
     client_key = models.CharField(max_length=40)
     session_key = models.CharField(max_length=40)
+
+class ASN(models.Model):
+    number = models.IntegerField()
+    name = models.CharField(max_length=255)
+
+class PeerInfo(models.Model):
+    ip = models.GenericIPAddressField(primary_key=True)
+    asnumber = models.ForeignKey("ASN",null=True,blank=True,on_delete=models.SET_NULL)
+    realip = models.GenericIPAddressField(default="")
+    country = models.CharField(max_length=40,default="")

@@ -3,6 +3,7 @@
 
 import os
 from django.core.urlresolvers import reverse_lazy
+import djcelery
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -86,6 +87,7 @@ INSTALLED_APPS = (
 
     #3rd party
     'crispy_forms',
+    'djcelery',
 
     #apps
     'threepwood.apps.main',
