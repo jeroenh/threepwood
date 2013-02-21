@@ -3,7 +3,7 @@
 {% load url from future %}
 
 {% block report %}
-    <h1>Client
+<h1>foobar</h1>
     <p>
         {{ client.description }}
     </p>
@@ -39,7 +39,6 @@
 
 
 
-    <h3>Torrents ({{ client.torrent_set.all|length }})
     <table class="table table-striped">
         <thead>
         <tr>
@@ -57,6 +56,7 @@
 
                 <td>{{ torrent.description|truncatechars:32 }}</td>
                 <td>{% if torrent.active %}Yes {% else %}No{% endif %}</td>
+
             </tr>
         {% endfor %}
         </tbody>

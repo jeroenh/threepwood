@@ -1,1 +1,40 @@
-TOOD
+{% extends 'reports/reports.html' %}
+{% load crispy_forms_tags %}
+{% load url from future %}
+
+
+{% block report %}
+
+    <h1>Clients</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Client Key</th>
+            <th>Description</th>
+            <th>Torrents</th>
+            <th>Last seen</th>
+            <th>Active</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for client in client_list %}
+            <tr data-id="{{ client.id }}">
+                <td>
+                    <a href="{% url "reports_client_detail" client.pk %}">{{ client.key|truncatechars:28 }}</a>
+                </td>
+                <td>
+                    {{ client.description|truncatechars:32 }}
+                </td>
+                <td>{{ client.torrent_set.all|length }}</td>
+                <td>
+                    {{ client.last_seen }}
+                </td>
+                <td>
+                    {% if client.active %}Yes {% else %}No{% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

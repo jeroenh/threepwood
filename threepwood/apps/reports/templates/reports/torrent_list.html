@@ -19,7 +19,7 @@
             <tr data-id="{{ torrent.id }}">
                 <td>{{ torrent.date_added|date:'d-m-Y H:m:s' }}</td>
                 <td>
-                    <a href="{% url 'reports_torrent_report' torrent.pk %}"> {{ torrent.info_hash|truncatechars:24 }} </a>
+                    <a href="{% url 'reports_torrent_detail' torrent.pk %}"> {{ torrent.info_hash|truncatechars:24 }} </a>
                 </td>
                 <td>
                     {{ torrent.description|truncatechars:32 }}

@@ -8,8 +8,12 @@ class ClientReport(TemplateView):
 
 class ClientReportList(ListView):
     queryset = Client.objects.all()
-    context_object_name = "client_list"
     template_name = "reports/client_list.html"
+
+class ClientReportDetail(DetailView):
+    model = Client
+    context_object_name = 'client'
+    template_name = "reports/client_detail.html"
 
 
 class TorrentReportList(ListView):
@@ -26,3 +30,9 @@ class TorrentReport(DetailView):
         context = super(DetailView, self).get_context_data(**kwargs)
 #        torrent = self.get_object()
         return context
+
+
+class TorrentReportDetail(DetailView):
+    model = Torrent
+    context_object_name = "torrent"
+    template_name = "reports/torrent_detail.html"

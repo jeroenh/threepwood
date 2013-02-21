@@ -6,7 +6,9 @@
     <div class="row-fluid">
         <div class="span2">
             <ul class="nav nav-list" data-spy="affix" data-offset-top="50">
-                <li><a href="#"><i class="icon-chevron-right"></i> Torrents</a></li>
+                <li><a href="{% url 'reports_torrent_list' %}"><i class="icon-chevron-right"></i> Torrents</a></li>
+                <li><a href="{% url 'reports_client_list' %}"><i class="icon-chevron-right"></i> Clients</a></li>
+                
             </ul>
             {% block controls %}
             {% endblock controls %}

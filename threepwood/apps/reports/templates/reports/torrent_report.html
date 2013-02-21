@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% load url from future %}
 
-{% block report %}
+{% block reports %}
 
 
     <h2>Metadata</h2>
@@ -24,7 +24,7 @@
     {% for session in torrent.sorted_session_set %}
         <tr>
             <td>{{ session.date_created }}</td>
-            <td><a href="{% url 'collector_client_detail' session.client.pk %}">{{ session.client|truncatechars:32 }}</a></td>
+            <td><a href="{% url 'reports_client_detail' session.client.pk %}">{{ session.client|truncatechars:32 }}</a></td>
             <td>{{ session.version }}</td>
             <td>{{ session.get_size }}</td>
         </tr>

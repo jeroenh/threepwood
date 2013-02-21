@@ -1,0 +1,93 @@
+{% extends 'reports/reports.html' %}
+{% load crispy_forms_tags %}
+{% load url from future %}
+
+
+{% block report %}
+    <h1>Torrent</h1>
+
+    <h5>Description for {{ torrent.info_hash }}</h5>
+    <p>
+        {{ torrent.description }}
+    </p>
+
+
+
+
+    {% if torrent.torrentmetadata.name %}
+        <h5>Metadata</h5>
+        <ul class="unstyled">
+            <li>Added: {{ torrent.date_added }}</li>
+            <li>Name: {{ torrent.torrentmetadata.name }}</li>
+            <li>Size: {{ torrent.torrentmetadata.size|filesizeformat }}</li>
+            <li>Creator: {{ torrent.torrentmetadata.creator }}</li>
+            <li>Comment: {{ torrent.torrentmetadata.comment }}</li>
+            <li>Active: {{ torrent.active }}</li>
+        </ul>
+
+        <h3>Files</h3>
+        <table class="table">
+            <thead>
+            <th>Name</th>
+            <th>Size</th>
+            </thead>
+            <tbody>
+            {% for f in  torrent.torrentmetadata.files_as_list %}
+                <tr>
+                    <td>{{ f.0 }}</td>
+                    <td>{{ f.1|filesizeformat }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+
+    {% else %}
+        <p>
+        No metadata available
+        </p>
+    {% endif %}
+
+
+
+
+    <h3>Clients ({{ torrent.clients.all|length }})
+    </h3>
+
+    {% if torrent.clients.all %}
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Client Key</th>
+                <th>Description</th>
+                <th>Torrents</th>
+                <th>Last seen</th>
+                <th>Last IP</th>
+                <th>Active</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for client in torrent.clients.all %}
+                <tr data-id="{{ client.id }}">
+                    <td>
+                        <a href="{% url "reports_client_detail" client.pk %}">{{ client.key|truncatechars:12 }}</a>
+                    </td>
+                    <td>{{ client.description }}</td>
+                    <td>{{ client.torrent_set.all|length }}</td>
+                    <td>{{ client.last_seen }}</td>
+                    <td>{{ client.last_ip }}</td>
+                    <td>{% if client.active %}Yes {% else %}No{% endif %}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+        No clients assigned to this torrent
+    {% endif %}
+
+
+{% endblock %}
+

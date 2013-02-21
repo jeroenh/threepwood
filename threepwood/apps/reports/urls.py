@@ -1,4 +1,3 @@
-from threepwood.apps.reports.views import ClientReport, TorrentReport, TorrentReportList, ClientReportList
 
 __author__ = 'cdumitru'
 
@@ -6,11 +5,15 @@ __author__ = 'cdumitru'
 from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import RedirectView
+from threepwood.apps.reports.views import ClientReport, TorrentReport, TorrentReportList, ClientReportList, ClientReportDetail,TorrentReportDetail
 
 urlpatterns = patterns('',
     url(r'^$', RedirectView.as_view(url=reverse_lazy("reports_torrent_list")), name="reports"),
-    url(r'^torrent/list/$',TorrentReportList.as_view(), name='reports_torrent_list'),
-    url(r'^client/list/$',ClientReportList.as_view(), name='reports_client_list'),
     url(r'^client/(?P<pk>\d+)/$',ClientReport.as_view(), name='reports_client_report'),
+    url(r'^client/detail/(?P<pk>\d+)$', ClientReportDetail.as_view(), name='reports_client_detail'),
+    url(r'^client/list/$',ClientReportList.as_view(), name='reports_client_list'),
+
     url(r'^torrent/(?P<pk>\d+)/$',TorrentReport.as_view(), name='reports_torrent_report'),
+    url(r'^torrent/detail/(?P<pk>\d+)$', TorrentReportDetail.as_view(), name='reports_torrent_detail'),
+    url(r'^torrent/list/$',TorrentReportList.as_view(), name='reports_torrent_list'),
 )
