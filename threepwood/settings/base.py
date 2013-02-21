@@ -87,6 +87,7 @@ INSTALLED_APPS = (
 
     #3rd party
     'crispy_forms',
+    'kombu.transport.django', 
     'djcelery',
 
     #apps
@@ -95,6 +96,10 @@ INSTALLED_APPS = (
     'threepwood.apps.collector',
 )
 CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
+BROKER_URL = "django://" # tell kombu to use the Django database as the message queue  
+# If we want to upgrade to RabbitMQ, we can use this:
+# BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
