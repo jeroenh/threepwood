@@ -1,6 +1,8 @@
 from threepwood.apps.collector.models import PeerRecord, PeerInfo, ASN
 from celery import task
 import bulkwhois.cymru
+import pygeoip
+import os
 
 @task()
 def add(x,y):
@@ -17,6 +19,8 @@ def fillPeerInfo():
             iptype = 4
         newPeerInfo = PeerInfo(ip=convertedIP,iptype=iptype)
         newPeerInfo.save()
+        p.peerinfo_id = newPeerInfo.id
+        p.save()
 
 
 def convert6to4(ip):
@@ -32,14 +36,24 @@ def convert6to4(ip):
         last = "0"+last
     return "%s.%s.%s.%s" % (int(first[0:2],16),int(first[2:4],16),int(last[0:2],16),int(last[2:4],16))
 
-# @task()
-# def massLookup():
-#     ips = threepwod.apps.collector.models.all()
-#     cymru = bulkwhois.lookup_ips(ips)
-#     for ip in ips:
-#         try:
-#             country = GEOIP.country_code_by_name(ip)
-#             result = (cymru[ip]['asn'],country, cymru[ip]['as_name'], ip)
-#         except socket.gaierror:
-#             result = (cymru[ip]['asn'],cymru[ip]['cc'], cymru[ip]['as_name'], ip)
-#         return result
+@task()
+def massLookup():
+    localdir = os.path.dirname(os.path.realpath(__file__))
+    GEOIP = pygeoip.GeoIP(os.path.join(localdir,'GeoIP.dat'))
+    peers = PeerInfo.objects.filter(asnumber__isnull=True, iptype=4)
+    ippeers = {}
+    for p in peers:
+        ippeers[str(p.ip)] = p
+    if ippeers:
+        cymru = bulkwhois.cymru.BulkWhoisCymru()
+        cymruresult = cymru.lookup_ips(ippeers.keys())
+        for ip,peer in ippeers.iteritems():
+            try:
+                country = GEOIP.country_code_by_name(ip)
+            except socket.gaierror:
+                country = cymruresult[ip]['cc']
+            peer.country = country
+            asn = ASN(number=cymruresult[ip]['asn'], name=cymruresult[ip]['as_name'])
+            asn.save()
+            peer.asnumber = asn
+            peer.save()
