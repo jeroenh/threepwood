@@ -1,4 +1,5 @@
 from threepwood.apps.collector.models import PeerRecord, PeerInfo, ASN
+from django.core.exceptions import ObjectDoesNotExist
 from celery import task
 import bulkwhois.cymru
 import pygeoip
@@ -17,7 +18,10 @@ def fillPeerInfo():
             iptype = 6
         else:
             iptype = 4
-        newPeerInfo = PeerInfo(ip=convertedIP,iptype=iptype)
+        try:
+            newPeerInfo = PeerInfo.objects.get(ip=convertedIP)
+        except ObjectDoesNotExist:
+            newPeerInfo = PeerInfo(ip=convertedIP,iptype=iptype)
         newPeerInfo.save()
         p.peerinfo_id = newPeerInfo.id
         p.save()

@@ -4,6 +4,9 @@ django
 django-tastypie
 django-crispy-forms
 gunicorn
+django-celery
+bulkwhois
+pygeoip
 
 # for lechuck
 requests
