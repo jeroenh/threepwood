@@ -132,11 +132,22 @@ class Session(models.Model):
     def __unicode__(self):
         return u"{0} {1} {2}".format(self.client, self.torrent.torrentmetadata.name, self.date_created)
 
+class ASN(models.Model):
+    number = models.IntegerField()
+    name = models.CharField(max_length=255)
+
+class PeerInfo(models.Model):
+    IP_TYPE = ((4,u"IPv4"),(6,u"IPv6"))
+    ip = models.GenericIPAddressField()
+    asnumber = models.ForeignKey("ASN",null=True,blank=True,on_delete=models.SET_NULL)
+    iptype = models.IntegerField(choices=IP_TYPE)
+    country = models.CharField(max_length=255,default="",null=True)
+
 class PeerRecord(models.Model):
     ip = models.GenericIPAddressField()
     date_added = models.DateTimeField(auto_now_add=True)
     session = models.ForeignKey(Session)
-
+    peerinfo = models.ForeignKey(PeerInfo,null=True)
     def __unicode__(self):
         return self.ip
 
@@ -150,12 +161,3 @@ class RawPeerRecord(models.Model):
     client_key = models.CharField(max_length=40)
     session_key = models.CharField(max_length=40)
 
-class ASN(models.Model):
-    number = models.IntegerField()
-    name = models.CharField(max_length=255)
-
-class PeerInfo(models.Model):
-    ip = models.GenericIPAddressField(primary_key=True)
-    asnumber = models.ForeignKey("ASN",null=True,blank=True,on_delete=models.SET_NULL)
-    realip = models.GenericIPAddressField(default="")
-    country = models.CharField(max_length=40,default="")
