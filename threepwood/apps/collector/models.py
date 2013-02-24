@@ -143,7 +143,7 @@ class ASN(models.Model):
 
 class PeerInfo(models.Model):
     IP_TYPE = ((4,u"IPv4"),(6,u"IPv6"))
-    ip = models.GenericIPAddressField()
+    ip = models.GenericIPAddressField(db_index=True)
     asnumber = models.ForeignKey("ASN",null=True,blank=True,on_delete=models.SET_NULL)
     iptype = models.IntegerField(choices=IP_TYPE)
     country = models.CharField(max_length=255,default="",null=True)
