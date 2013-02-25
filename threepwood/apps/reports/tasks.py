@@ -50,7 +50,7 @@ def queryset_iterator(queryset, chunksize=1000):
             pk = row.pk
             yield row
         endtime = time.time()
-        print "Finished %s in %2.3f sec" % (chunksize, starttime-endtime)
+        print "Finished %s in %2.3f sec" % (chunksize, endtime-starttime)
         gc.collect()
         
 def convert6to4(ip):
