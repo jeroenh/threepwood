@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^main/', include('threepwood.apps.main.urls')),
     url(r'^collector/', include('threepwood.apps.collector.urls')),
     url(r'^reports/', include('threepwood.apps.reports.urls')),
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
     url(r'^admin/', include(admin.site.urls)),
 )
 

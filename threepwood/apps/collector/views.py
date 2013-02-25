@@ -8,25 +8,30 @@ from django.views.decorators.csrf import csrf_exempt
 from threepwood.apps.collector.forms import TorrentForm, ClientCreateForm, ClientUpdateForm, TorrentAddClientForm, ConfirmDelete, TorrentRemoveClientForm, TorrentUpdateForm, ClientAddTorrentForm
 from threepwood.apps.collector.models import Client, Torrent, PeerRecord, Session, RawPeerRecord
 from threepwood.settings.base import MAX_PEERS_THRESHOLD, REPORT_INTERVAL, CHECK_FOR_UPDATES_INTERVAL
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 __author__ = 'cdumitru'
 
 from django import http
-from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, View
 
-
-class ClientList(ListView):
+class ProtectedView(View):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProtectedView, self).dispatch(*args, **kwargs)
+    
+class ClientList(ListView, ProtectedView):
     queryset = Client.objects.all()
     context_object_name = "client_list"
 
-
-class ClientCreate(CreateView):
+class ClientCreate(CreateView, ProtectedView):
     model = Client
     form_class = ClientCreateForm
     success_url = reverse_lazy('collector_client_list')
 
 
-class ClientUpdate(UpdateView):
+class ClientUpdate(UpdateView, ProtectedView):
     model = Client
     form_class = ClientUpdateForm
 
@@ -34,17 +39,17 @@ class ClientUpdate(UpdateView):
         return reverse_lazy('collector_client_detail', kwargs={'pk': self.kwargs['pk']})
 
 
-class ClientDetail(DetailView):
+class ClientDetail(DetailView, ProtectedView):
     model = Client
     context_object_name = 'client'
 
 
-class TorrentList(ListView):
+class TorrentList(ListView, ProtectedView):
     queryset = Torrent.objects.all()
     context_object_name = "torrent_list"
 
 
-class ClientDelete(DeleteView):
+class ClientDelete(DeleteView, ProtectedView):
     model = Client
     success_url = reverse_lazy('collector_client_list')
 
@@ -54,13 +59,13 @@ class ClientDelete(DeleteView):
         return context
 
 
-class TorrentCreate(CreateView):
+class TorrentCreate(CreateView, ProtectedView):
     model = Torrent
     form_class = TorrentForm
     success_url = reverse_lazy('collector_torrent_list')
 
 
-class TorrentUpdate(UpdateView):
+class TorrentUpdate(UpdateView, ProtectedView):
     model = Torrent
     form_class = TorrentUpdateForm
 
@@ -68,12 +73,12 @@ class TorrentUpdate(UpdateView):
         return reverse_lazy('collector_torrent_detail', kwargs={'pk': self.kwargs['pk']})
 
 
-class TorrentDetail(DetailView):
+class TorrentDetail(DetailView, ProtectedView):
     model = Torrent
     context_object_name = "torrent"
 
 
-class TorrentDelete(DeleteView):
+class TorrentDelete(DeleteView, ProtectedView):
     model = Torrent
     success_url = reverse_lazy('collector_torrent_list')
 
