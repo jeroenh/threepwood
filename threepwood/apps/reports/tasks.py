@@ -61,7 +61,7 @@ def convert6to4(ip):
     return "%s.%s.%s.%s" % (int(first[0:2],16),int(first[2:4],16),int(last[0:2],16),int(last[2:4],16))
 
 @task()
-def massLookup(chunksize=10000):
+def massLookup(chunksize=5000):
     localdir = os.path.dirname(os.path.realpath(__file__))
     GEOIP = pygeoip.GeoIP(os.path.join(localdir,'GeoIP.dat'))
     peers = PeerInfo.objects.filter(asnumber__isnull=True, iptype=4)[:chunksize]
@@ -81,3 +81,4 @@ def massLookup(chunksize=10000):
             asn.save()
             peer.asnumber = asn
             peer.save()
+    print "Finshed updating %s peers" % len(ippeers.keys())
