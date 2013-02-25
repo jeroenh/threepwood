@@ -82,7 +82,7 @@ def massLookup(chunksize=5000):
                 asn.save()
             except ValueError as e:
                 print "Found an invalid ASN number for %s: %s (%s)" % (ip, cymruresult[ip]['asn'], cymruresult[ip]['as_name'])
-                asn = ASN(number=-1], name="Unknown AS Number")
+                asn = ASN(number=-1, name="Unknown AS Number")
                 asn.save()
             peer.asnumber = asn
             peer.save()
