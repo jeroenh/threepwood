@@ -5,6 +5,7 @@ import bulkwhois.cymru
 import pygeoip
 import os
 import gc
+import time
 
 @task()
 def add(x,y):
@@ -18,6 +19,8 @@ def fillPeerInfo():
             iptype = 6
         else:
             iptype = 4
+        # newPeerInfo = PeerInfo.objects.get_or_create(ip=convertedIP,defaults={'iptype':iptype})[0]
+            
         try:
             newPeerInfo = PeerInfo.objects.get(ip=convertedIP)
         except ObjectDoesNotExist:
@@ -42,9 +45,12 @@ def queryset_iterator(queryset, chunksize=1000):
     last_pk = queryset.order_by('-pk')[0].pk
     queryset = queryset.order_by('pk')
     while pk < last_pk:
+        starttime = time.time()
         for row in queryset.filter(pk__gt=pk)[:chunksize]:
             pk = row.pk
             yield row
+        endtime = time.time()
+        print "Finished %s in %2.3f sec" % (chunksize, starttime-endtime)
         gc.collect()
         
 def convert6to4(ip):
