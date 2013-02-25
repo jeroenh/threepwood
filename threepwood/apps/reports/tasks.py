@@ -19,13 +19,7 @@ def fillPeerInfo():
             iptype = 6
         else:
             iptype = 4
-        # newPeerInfo = PeerInfo.objects.get_or_create(ip=convertedIP,defaults={'iptype':iptype})[0]
-            
-        try:
-            newPeerInfo = PeerInfo.objects.get(ip=convertedIP)
-        except ObjectDoesNotExist:
-            newPeerInfo = PeerInfo(ip=convertedIP,iptype=iptype)
-            newPeerInfo.save()
+        newPeerInfo = PeerInfo.objects.get_or_create(ip=convertedIP,defaults={'iptype':iptype})[0]
         p.peerinfo_id = newPeerInfo.id
         p.save()
 
@@ -67,10 +61,10 @@ def convert6to4(ip):
     return "%s.%s.%s.%s" % (int(first[0:2],16),int(first[2:4],16),int(last[0:2],16),int(last[2:4],16))
 
 @task()
-def massLookup():
+def massLookup(chunksize=10000):
     localdir = os.path.dirname(os.path.realpath(__file__))
     GEOIP = pygeoip.GeoIP(os.path.join(localdir,'GeoIP.dat'))
-    peers = PeerInfo.objects.filter(asnumber__isnull=True, iptype=4)
+    peers = PeerInfo.objects.filter(asnumber__isnull=True, iptype=4)[:chunksize]
     ippeers = {}
     for p in peers:
         ippeers[str(p.ip)] = p
