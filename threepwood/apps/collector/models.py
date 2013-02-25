@@ -160,12 +160,37 @@ class PeerInfo(models.Model):
     def __unicode__(self):
         return self.ip
 
+def convert6to4(ip):
+    if not ":" in ip:
+        return ip
+    if not ip.startswith("2002:"):
+        return ip
+    s = ip.split(":")
+    first,last = s[1:3]
+    if len(first) < 4:
+        first = "0"+first
+    if len(last) < 4:
+        last = "0"+last
+    return "%s.%s.%s.%s" % (int(first[0:2],16),int(first[2:4],16),int(last[0:2],16),int(last[2:4],16))
 
 class PeerRecord(models.Model):
     ip = models.GenericIPAddressField()
     date_added = models.DateTimeField(auto_now_add=True)
     session = models.ForeignKey(Session)
-    peerinfo = models.ForeignKey(PeerInfo, null=True)
+    peerinfo = models.ForeignKey(PeerInfo, null=True,blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.peerinfo:
+            convertedIP = convert6to4(self.ip)
+            if ":" in convertedIP:
+                iptype = 6
+            else:
+                iptype = 4
+            try:
+                self.peerinfo = PeerInfo.objects.get_or_create(ip=convertedIP,defaults={'iptype':iptype})[0]
+            except:
+                self.peerinfo = None
+        super(PeerRecord, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.ip
