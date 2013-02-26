@@ -35,10 +35,23 @@
                     <li class="{% active request collector %}"><a href="{{ collector }}"><i class="icon-filter icon-white"></i> Collector</a>
                     </li>
                     <li class="{% active request reports %}"><a href="{{ reports }}"><i class="icon-briefcase icon-white"></i> Reports</a>
+                    {% if user.is_staff %}
+                    <li><a href="{% url 'admin:index' %}"><i class="icon-cog icon-white"></i>Admin</a></li>
+                    {% endif %}
                 </ul>
             </div>
             <!--/.nav-collapse -->
+            <div class="pull-right">
+                {% if user.is_authenticated %}
+                    <span class="navbar-text">Hi, <a href="{% url 'auth_password_change' %}">{{ user.username }}</a></span>
+                    <a class="btn btn-danger" href="{% url 'auth_logout' %}"><i class="icon-off icon-white"></i>Sign out</a>
+                {% else %}
+                    <a class="btn btn-primary" href={% url 'auth_login' %}><i class="icon-user icon-white"></i>Login</a>
+                {% endif %}
+            </div>
+
         </div>
+
     </div>
 </div>
 
