@@ -9,14 +9,14 @@ from threepwood.apps.main.forms import ThreepwoodAuthenticationForm
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', RedirectView.as_view(url=reverse_lazy("home"))),
-    url(r'^main/', include('threepwood.apps.main.urls')),
-    url(r'^collector/', include('threepwood.apps.collector.urls')),
-    url(r'^reports/', include('threepwood.apps.reports.urls')),
-    url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'authentication_form': ThreepwoodAuthenticationForm, }, name='auth_login'),
+                       url(r'^$', RedirectView.as_view(url=reverse_lazy("home"))),
+                       url(r'^main/', include('threepwood.apps.main.urls')),
+                       url(r'^collector/', include('threepwood.apps.collector.urls')),
+                       url(r'^reports/', include('threepwood.apps.reports.urls')),
+                       url(r'^accounts/login/$', 'django.contrib.auth.views.login',
+                           {'authentication_form': ThreepwoodAuthenticationForm, }, name='auth_login'),
 
-    url(r'^admin/', include(admin.site.urls)),
+                       url(r'^admin/', include(admin.site.urls)),
 )
-
 
 urlpatterns += staticfiles_urlpatterns()

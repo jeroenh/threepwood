@@ -5,8 +5,6 @@ from django.utils.translation import ugettext as _
 
 __author__ = 'cdumitru'
 
-
-
 class ThreepwoodAuthenticationForm(AuthenticationForm):
     title = "Login form"
     def __init__(self, *args, **kwargs):
