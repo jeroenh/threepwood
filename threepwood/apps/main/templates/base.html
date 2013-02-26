@@ -43,7 +43,7 @@
             <!--/.nav-collapse -->
             <div class="pull-right">
                 {% if user.is_authenticated %}
-                    <span class="navbar-text">Hi, <a href="{% url 'auth_password_change' %}">{{ user.username }}</a></span>
+                    <span class="navbar-text">Hi, {{ user.username }}</span>
                     <a class="btn btn-danger" href="{% url 'auth_logout' %}"><i class="icon-off icon-white"></i>Sign out</a>
                 {% else %}
                     <a class="btn btn-primary" href={% url 'auth_login' %}><i class="icon-user icon-white"></i>Login</a>
