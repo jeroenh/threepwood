@@ -7,19 +7,16 @@ from django.utils.simplejson import dumps, loads
 from django.views.decorators.csrf import csrf_exempt
 from threepwood.apps.collector.forms import TorrentForm, ClientCreateForm, ClientUpdateForm, TorrentAddClientForm, ConfirmDelete, TorrentRemoveClientForm, TorrentUpdateForm, ClientAddTorrentForm
 from threepwood.apps.collector.models import Client, Torrent, PeerRecord, Session, RawPeerRecord
+from threepwood.apps.main.views import ProtectedView
 from threepwood.settings.base import MAX_PEERS_THRESHOLD, REPORT_INTERVAL, CHECK_FOR_UPDATES_INTERVAL
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
+
 
 __author__ = 'cdumitru'
 
 from django import http
-from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, View
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
-class ProtectedView(View):
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(ProtectedView, self).dispatch(*args, **kwargs)
+
     
 class ClientList(ListView, ProtectedView):
     queryset = Client.objects.all()

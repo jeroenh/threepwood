@@ -1,25 +1,29 @@
 # Create your views here.
 from django.views.generic import TemplateView, DetailView, ListView
 from threepwood.apps.collector.models import Torrent, PeerRecord, Client
+from threepwood.apps.main.views import ProtectedView
 
-class ClientReport(TemplateView):
+
+class ClientReport(TemplateView, ProtectedView):
     template_name = "reports/client_report.html"
 
 
-class ClientReportList(ListView):
+class ClientReportList(ListView, ProtectedView):
     queryset = Client.objects.all()
     template_name = "reports/client_list.html"
 
-class ClientReportDetail(DetailView):
+
+class ClientReportDetail(DetailView, ProtectedView):
     model = Client
     context_object_name = 'client'
     template_name = "reports/client_detail.html"
 
 
-class TorrentReportList(ListView):
+class TorrentReportList(ListView, ProtectedView):
     queryset = Torrent.objects.all()
     context_object_name = "torrent_list"
     template_name = "reports/torrent_list.html"
+
 
 class TorrentReport(DetailView):
     model = Torrent
@@ -28,11 +32,11 @@ class TorrentReport(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
-#        torrent = self.get_object()
+        #        torrent = self.get_object()
         return context
 
 
-class TorrentReportDetail(DetailView):
+class TorrentReportDetail(DetailView, ProtectedView):
     model = Torrent
     context_object_name = "torrent"
     template_name = "reports/torrent_detail.html"

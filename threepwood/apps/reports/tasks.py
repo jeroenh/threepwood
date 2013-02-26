@@ -1,3 +1,4 @@
+import socket
 from threepwood.apps.collector.models import PeerRecord, PeerInfo, ASN
 from django.core.exceptions import ObjectDoesNotExist
 from celery import task
@@ -7,9 +8,11 @@ import os
 import gc
 import time
 
+
 @task()
-def add(x,y):
-    return x+y
+def add(x, y):
+    return x + y
+
 
 @task()
 def fillPeerInfo():
@@ -19,7 +22,7 @@ def fillPeerInfo():
             iptype = 6
         else:
             iptype = 4
-        newPeerInfo = PeerInfo.objects.get_or_create(ip=convertedIP,defaults={'iptype':iptype})[0]
+        newPeerInfo = PeerInfo.objects.get_or_create(ip=convertedIP, defaults={'iptype': iptype})[0]
         p.peerinfo_id = newPeerInfo.id
         p.save()
 
@@ -44,26 +47,28 @@ def queryset_iterator(queryset, chunksize=1000):
             pk = row.pk
             yield row
         endtime = time.time()
-        print "Finished %s in %2.3f sec" % (chunksize, endtime-starttime)
+        print "Finished %s in %2.3f sec" % (chunksize, endtime - starttime)
         gc.collect()
-        
+
+
 def convert6to4(ip):
     if not ":" in ip:
         return ip
     if not ip.startswith("2002:"):
         return ip
     s = ip.split(":")
-    first,last = s[1:3]
+    first, last = s[1:3]
     if len(first) < 4:
-        first = "0"+first
+        first = "0" + first
     if len(last) < 4:
-        last = "0"+last
-    return "%s.%s.%s.%s" % (int(first[0:2],16),int(first[2:4],16),int(last[0:2],16),int(last[2:4],16))
+        last = "0" + last
+    return "%s.%s.%s.%s" % (int(first[0:2], 16), int(first[2:4], 16), int(last[0:2], 16), int(last[2:4], 16))
+
 
 @task()
 def massLookup(chunksize=5000):
     localdir = os.path.dirname(os.path.realpath(__file__))
-    GEOIP = pygeoip.GeoIP(os.path.join(localdir,'GeoIP.dat'))
+    GEOIP = pygeoip.GeoIP(os.path.join(localdir, 'GeoIP.dat'))
     peers = PeerInfo.objects.filter(asnumber__isnull=True, iptype=4)[:chunksize]
     ippeers = {}
     for p in peers:
@@ -71,7 +76,7 @@ def massLookup(chunksize=5000):
     if ippeers:
         cymru = bulkwhois.cymru.BulkWhoisCymru()
         cymruresult = cymru.lookup_ips(ippeers.keys())
-        for ip,peer in ippeers.iteritems():
+        for ip, peer in ippeers.iteritems():
             try:
                 country = GEOIP.country_code_by_name(ip)
             except socket.gaierror:
@@ -81,10 +86,11 @@ def massLookup(chunksize=5000):
             try:
                 asn.save()
             except ValueError as e:
-                print "Found an invalid ASN number for %s: %s (%s)" % (ip, cymruresult[ip]['asn'], cymruresult[ip]['as_name'])
+                print "Found an invalid ASN number for %s: %s (%s)" % (
+                    ip, cymruresult[ip]['asn'], cymruresult[ip]['as_name'])
                 asn = ASN(number=-1, name="Unknown AS Number")
                 asn.save()
             peer.asnumber = asn
             peer.save()
-            
+
     print "Finshed updating %s peers" % len(ippeers.keys())
