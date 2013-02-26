@@ -14,7 +14,7 @@ urlpatterns = patterns('',
                        url(r'^collector/', include('threepwood.apps.collector.urls')),
                        url(r'^reports/', include('threepwood.apps.reports.urls')),
                        url(r'^accounts/login/$', auth_views.login,
-                           {'authentication_form': ThreepwoodAuthenticationForm, }, name='auth_login'),
+                           {'authentication_form': ThreepwoodAuthenticationForm, 'next_page':reverse_lazy("home") }, name='auth_login'),
                        url(r'^accounts/logout/$', auth_views.logout, {'next_page': reverse_lazy("home")},
                            name='auth_logout'),
 

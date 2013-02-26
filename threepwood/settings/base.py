@@ -95,6 +95,9 @@ INSTALLED_APPS = (
     'threepwood.apps.reports',
     'threepwood.apps.collector',
 )
+
+LOGIN_REDIRECT_URL = reverse_lazy('home')
+
 CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
 BROKER_URL = "django://" # tell kombu to use the Django database as the message queue  
 # If we want to upgrade to RabbitMQ, we can use this:
@@ -128,6 +131,7 @@ LOGGING = {
         },
     }
 }
+
 
 
 #Threepwood settings - TODO get from database ...
