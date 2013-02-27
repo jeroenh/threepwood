@@ -93,4 +93,4 @@ def massLookup(chunksize=5000):
             peer.asnumber = asn
             peer.save()
 
-    print "Finshed updating %s peers" % len(ippeers.keys())
+    return "Finshed updating %s peers" % len(ippeers.keys())
