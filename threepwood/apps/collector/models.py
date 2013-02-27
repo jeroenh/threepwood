@@ -79,7 +79,6 @@ class Torrent(models.Model):
 
         super(Torrent, self).save(*args, **kwargs)
 
-    @property
     def distinct_peers_count(self):
         return PeerRecord.objects.filter(session__in=self.session_set.all()).distinct().count()
 
