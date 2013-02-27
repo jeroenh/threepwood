@@ -1,4 +1,4 @@
-# for django-threepwood
+# requirements/common.txt for django-threepwood
 django=1.5
 django-crispy-forms
 south
@@ -6,6 +6,3 @@ south
 django-celery
 bulkwhois
 pygeoip
-
-# for lechuck
-requests

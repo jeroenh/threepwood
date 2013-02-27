@@ -1,3 +1,4 @@
 #for production
+-r common.txt
 gunicorn
 mysql-python
