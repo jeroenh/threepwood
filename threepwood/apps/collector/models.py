@@ -73,16 +73,15 @@ class Torrent(models.Model):
     def __unicode__(self):
         return u"{0} | {1} | {2}".format(self.info_hash, self.active, self.date_added)
 
-
     def save(self, *args, **kwargs):
         if not self.info_hash:
             self.info_hash = self.magnet.split("&")[0].split(':')[-1]
 
         super(Torrent, self).save(*args, **kwargs)
 
-    def distinct_peers(self):
-        return PeerRecord.objects.filter(session__in=self.session_set.all()).values_list('ip',
-                                                                                         flat=True).distinct().count()
+    @property
+    def distinct_peers_count(self):
+        return PeerRecord.objects.filter(session__in=self.session_set.all()).distinct().count()
 
     def dutch_peers(self):
         dutch_asnumbers = [9143, 6830, 8737, 5615, 3265]

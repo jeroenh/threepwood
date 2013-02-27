@@ -16,11 +16,10 @@ __author__ = 'cdumitru'
 from django import http
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
-
-    
 class ClientList(ListView, ProtectedView):
     queryset = Client.objects.all()
     context_object_name = "client_list"
+
 
 class ClientCreate(CreateView, ProtectedView):
     model = Client
@@ -146,6 +145,11 @@ def post_peers(request):
         res['success'] = True
         res['client_active'] = session.client.active
         res['session_active'] = session.is_active()
+
+# SELECT `collector_client`.`id`, `collector_client`.`key`, `collector_client`.`description`, `collector_client`.`active`
+# FROM `collector_client`
+# INNER JOIN `collector_torrent_clients` ON (`collector_client`.`id` = `collector_torrent_clients`.`client_id`)
+# WHERE `collector_torrent_clients`.`torrent_id` = N
 
         #this will create a new session every max_liftime seconds
         #this creates some stress on the db. maybe the client should get a new session only via GET ?
