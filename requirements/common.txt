@@ -1,5 +1,5 @@
 # requirements/common.txt for django-threepwood
-django=1.5
+Django==1.5
 django-crispy-forms
 south
 #task req
