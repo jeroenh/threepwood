@@ -1,5 +1,6 @@
 # Create your views here.
 from django.views.generic import TemplateView, DetailView, ListView
+from django.views.generic.detail import SingleObjectMixin
 from threepwood.apps.collector.models import Torrent, PeerRecord, Client
 from threepwood.apps.main.views import ProtectedView
 
@@ -36,7 +37,15 @@ class TorrentReport(DetailView):
         return context
 
 
-class TorrentReportDetail(DetailView, ProtectedView):
-    model = Torrent
+class TorrentReportDetail(SingleObjectMixin, ListView, ProtectedView):
+    paginate_by = 20
     context_object_name = "torrent"
     template_name = "reports/torrent_report.html"
+
+    def get_context_data(self, **kwargs):
+        kwargs['torrent'] = self.object
+        return super(TorrentReportDetail, self).get_context_data(**kwargs)
+
+    def get_queryset(self):
+        self.object = self.get_object(Torrent.objects.all())
+        return self.object.session_set.all().order_by('-date_created')

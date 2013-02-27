@@ -1,6 +1,7 @@
 {% extends 'reports/reports.html' %}
 {% load crispy_forms_tags %}
 {% load url from future %}
+{% load bootstrap_pagination %}
 
 {% block container %}
 
@@ -23,6 +24,7 @@
     </ul>
 
       <h2>Sessions({{ torrent.session_set.all|length }})</h2>
+    {% bootstrap_paginate page_obj url_view_name="reports_torrent_list_paginate" range=10 show_prev_next="true" show_first_last="true" %}
 
      <table class="table">
      <thead>
@@ -32,7 +34,7 @@
      <th>Peer count</th>
      </thead>
      <tbody>
-    {% for session in torrent.sorted_session_set %}
+    {% for session in page_obj %}
         <tr>
             <td>{{ session.date_created }}</td>
             <td><a href="{% url 'reports_client_detail' session.client.pk %}">{{ session.client|truncatechars:32 }}</a></td>
