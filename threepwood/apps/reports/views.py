@@ -48,4 +48,4 @@ class TorrentReportDetail(SingleObjectMixin, ListView, ProtectedView):
 
     def get_queryset(self):
         self.object = self.get_object(Torrent.objects.all())
-        return self.object.session_set.all()
+        return self.object.session_set.all().order_by('-date_created')

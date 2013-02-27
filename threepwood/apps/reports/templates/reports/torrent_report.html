@@ -24,7 +24,7 @@
      <th>Peer count</th>
      </thead>
      <tbody>
-    {% for session in torrent.sorted_session_set %}
+    {% for session in page_obj %}
         <tr>
             <td>{{ session.date_created }}</td>
             <td><a href="{% url 'reports_client_detail' session.client.pk %}">{{ session.client|truncatechars:32 }}</a></td>
