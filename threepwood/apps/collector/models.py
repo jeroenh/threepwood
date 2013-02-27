@@ -79,12 +79,16 @@ class Torrent(models.Model):
 
         super(Torrent, self).save(*args, **kwargs)
 
-    def distinct_peers_count(self):
-        return PeerRecord.objects.filter(session__in=self.session_set.all()).distinct().count()
+    def distinct_peers(self):
+
+        #TODO optimize this
+        return PeerRecord.objects.filter(session__in=self.session_set.all()).values_list('ip',
+                                                                                         flat=True).distinct().count()
 
     def dutch_peers(self):
         dutch_asnumbers = [9143, 6830, 8737, 5615, 3265]
         dutch_peers = PeerRecord.objects.filter(session__in=self.session_set.all(), peerinfo__country="NL").distinct()
+
         dutch_peers_count = dutch_peers.count()
         result = {"total": dutch_peers_count}
         for asn in dutch_asnumbers:

@@ -13,13 +13,11 @@
             <table class="table">
                 <thead><th>ASName</th><th>Percentage</th></thead>
                 <tbody>
-                    {{ torrent.dutch_peers }}
                     {% for key, value in torrent.dutch_peers.items %}
                        <tr> <td>{{ key }}</td> <td>{{ value|floatformat:2  }}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
-            </ul>
         </li>
     </ul>
 
