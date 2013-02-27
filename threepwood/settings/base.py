@@ -98,7 +98,7 @@ INSTALLED_APPS = (
 
 LOGIN_REDIRECT_URL = reverse_lazy('home')
 
-# CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
+CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
 BROKER_URL = "django://" # tell kombu to use the Django database as the message queue  
 # If we want to upgrade to RabbitMQ, we can use this:
 # BROKER_URL = 'amqp://guest:guest@localhost:5672//'

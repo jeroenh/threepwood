@@ -2,13 +2,14 @@
 {% load crispy_forms_tags %}
 {% load url from future %}
 
-{% block reports %}
+{% block container %}
 
 
     <h2>Metadata</h2>
     <ul class="unstyled">
         <li>{{ torrent.torrentmetadata.name }}</li>
         <li>Total distinct peers {{ torrent.distinct_peers }}</li>
+        <li>Total distinct dutch peers {{ torrent.dutch_peers }}</li>
     </ul>
 
       <h2>Sessions({{ torrent.session_set.all|length }})</h2>

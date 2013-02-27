@@ -39,4 +39,4 @@ class TorrentReport(DetailView):
 class TorrentReportDetail(DetailView, ProtectedView):
     model = Torrent
     context_object_name = "torrent"
-    template_name = "reports/torrent_detail.html"
+    template_name = "reports/torrent_report.html"

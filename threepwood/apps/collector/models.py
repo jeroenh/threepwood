@@ -85,6 +85,9 @@ class Torrent(models.Model):
         return PeerRecord.objects.filter(session__in=self.session_set.all()).values_list('ip',
                                                                                          flat=True).distinct().count()
 
+    def dutch_peers(self):
+        return PeerRecord.objects.filter(session__in=self.session_set.all(),peerinfo__country="NL").values_list('ip',flat=True).distinct().count()
+        
     @property
     def sorted_session_set(self):
         return self.session_set.order_by('-date_created')
