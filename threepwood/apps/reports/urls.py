@@ -16,4 +16,6 @@ urlpatterns = patterns('',
     url(r'^torrent/(?P<pk>\d+)/$',TorrentReport.as_view(), name='reports_torrent_report'),
     url(r'^torrent/detail/(?P<pk>\d+)$', TorrentReportDetail.as_view(), name='reports_torrent_detail'),
     url(r'^torrent/list/$',TorrentReportList.as_view(), name='reports_torrent_list'),
+    url(r'^torrent/list/(?P<page>\d+)/$',TorrentReportList.as_view(), name='reports_torrent_list_paginate'),
+
 )

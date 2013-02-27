@@ -89,6 +89,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'kombu.transport.django', 
     'djcelery',
+    'bootstrap-pagination',
 
     #apps
     'threepwood.apps.main',
