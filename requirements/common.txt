@@ -1,8 +1,8 @@
 # requirements/common.txt for django-threepwood
 Django==1.5
-django-crispy-forms
-south
+django-crispy-forms==1.2.3
+South==0.7.6
 #task req
-django-celery
-bulkwhois
-pygeoip
+django-celery==3.0.11
+BulkWhois==0.2.1
+pygeoip==0.2.6

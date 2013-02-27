@@ -1,4 +1,4 @@
 #for production
 -r common.txt
-gunicorn
-mysql-python
+gunicorn==0.17.2
+MySQL-python==1.2.4
