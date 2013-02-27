@@ -1,6 +1,0 @@
-# for threepwood
-django
-django-crispy-forms
-
-# for lechuck
-requests

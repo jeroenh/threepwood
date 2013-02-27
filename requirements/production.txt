@@ -1,0 +1,3 @@
+#for production
+gunicorn
+mysql-python
