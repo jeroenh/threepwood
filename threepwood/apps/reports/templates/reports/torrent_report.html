@@ -26,6 +26,22 @@
       <h2>Sessions({{ torrent.session_set.all|length }})</h2>
 {#    {% bootstrap_paginate page_obj url_view_name="reports_torrent_detail_paginate" range=10 show_prev_next="true" show_first_last="true" url_extra_args=torrent %}#}
 
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+            {% endif %}
+        </span>
+    </div>
+
      <table class="table">
      <thead>
      <th>Created</th>
