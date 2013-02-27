@@ -79,7 +79,7 @@ class Torrent(models.Model):
 
         super(Torrent, self).save(*args, **kwargs)
 
-    def distinct_peers(self):
+    def distinct_peers_count(self):
 
         #TODO optimize this
         return PeerRecord.objects.filter(session__in=self.session_set.all()).values_list('ip',
