@@ -195,7 +195,7 @@ def convert6to4(ip):
 
 
 class PeerRecord(models.Model):
-    ip = models.GenericIPAddressField()
+    ip = models.GenericIPAddressField(db_index=True)
     date_added = models.DateTimeField(auto_now_add=True)
     session = models.ForeignKey(Session)
     peerinfo = models.ForeignKey(PeerInfo, null=True, blank=True)
