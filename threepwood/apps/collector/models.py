@@ -103,6 +103,27 @@ class Torrent(models.Model):
                 dutch_peers_count)) * 100
         return result
 
+    def get_statistics(self, country_code="NL", as_numbers=(9143, 6830, 8737, 5615, 3265)):
+        result = {}
+        peers = PeerRecord.objects.filter(sesion__in=self.session_set.all()).select_related()
+        peers_country = peers.filter(peerinfo__country="NL").distinct()
+
+        peers_count_total = peers.values_list('ip').distinct().count()
+        peers_count_country = peers_country.values_list('ip').count()
+
+        for asn in as_numbers:
+            try:
+                asname = ASN.objects.get(number=asn).name
+            except ObjectDoesNotExist:
+                asname = str(asn)
+            result[asname] = (peers_country.filter(peerinfo__asnumber__number=asn).count() / float(
+                peers_count_country)) * 100
+
+        result['total_distinct'] = peers_count_total
+        result['total_distinct+_' + country_code] = peers_count_country
+        return result
+
+
 
     @property
     def sorted_session_set(self):

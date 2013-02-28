@@ -8,12 +8,12 @@
     <h2>Metadata</h2>
     <ul class="unstyled">
         <li>{{ torrent.torrentmetadata.name }}</li>
-        <li>Total distinct peers {{ torrent.distinct_peers_count }}</li>
-        <li>Dutch statistics:
+{#        <li>Total distinct peers {{ torrent.distinct_peers_count }}</li>#}
+        <li>Statistics:
             <table class="table">
                 <thead><th>ASName</th><th>Percentage</th></thead>
                 <tbody>
-                    {% for key, value in torrent.dutch_peers.items %}
+                    {% for key, value in torrent.get_statistics.items %}
                        <tr> <td>{{ key }}</td> <td>{{ value|floatformat:2  }}</td></tr>
                     {% endfor %}
                 </tbody>
