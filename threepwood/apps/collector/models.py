@@ -85,17 +85,14 @@ class Torrent(models.Model):
         return PeerRecord.objects.filter(session__in=self.session_set.all()).values_list('ip',
                                                                                          flat=True).distinct().count()
 
-    def distinct_peers_count(self):
-        return PeerRecord.objects.filter(session__in=self.session_set.all()).values_list('ip',
-                                                                                         flat=True).distinct().count()
-
     def dutch_peers(self):
         dutch_asnumbers = [9143, 6830, 8737, 5615, 3265]
-        dutch_peers = PeerRecord.objects.filter(session__in=self.session_set.all(), peerinfo__country="NL").distinct()
-        dutch_peers_count = PeerRecord.objects.filter(session__in=self.session_set.all(),
-                                                      peerinfo__country="NL").count()
-        result = {}
-        result["total"] = dutch_peers_count
+        dutch_peers = PeerRecord.objects.filter(session__in=self.session_set.all(), peerinfo__country="NL").select_related().distinct()
+        # dutch_peers_count = PeerRecord.objects.filter(session__in=self.session_set.all(),
+        #                                               peerinfo__country="NL").count()
+        dutch_peers_count = dutch_peers.count()
+
+        result = {"total": dutch_peers_count}
         for asn in dutch_asnumbers:
             # result[ASN.objects.get(asn).name] = dutch_peers.filter(peerinfo__asnumber__number=asn).count() / dutch_peers_count
             try:
