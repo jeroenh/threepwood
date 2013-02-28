@@ -105,7 +105,7 @@ class Torrent(models.Model):
 
     def get_statistics(self, country_code="NL", as_numbers=(9143, 6830, 8737, 5615, 3265)):
         result = {}
-        peers = PeerRecord.objects.filter(sesion__in=self.session_set.all()).select_related()
+        peers = PeerRecord.objects.filter(session__in=self.session_set.all()).select_related()
         peers_country = peers.filter(peerinfo__country="NL").distinct()
 
         peers_count_total = peers.values_list('ip').distinct().count()
