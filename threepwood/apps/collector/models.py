@@ -73,32 +73,57 @@ class Torrent(models.Model):
     def __unicode__(self):
         return u"{0} | {1} | {2}".format(self.info_hash, self.active, self.date_added)
 
-
     def save(self, *args, **kwargs):
         if not self.info_hash:
             self.info_hash = self.magnet.split("&")[0].split(':')[-1]
 
         super(Torrent, self).save(*args, **kwargs)
 
-    def distinct_peers(self):
+    def distinct_peers_count(self):
+
+        #TODO optimize this
         return PeerRecord.objects.filter(session__in=self.session_set.all()).values_list('ip',
                                                                                          flat=True).distinct().count()
 
     def dutch_peers(self):
-        dutch_asnumbers = [9143, 6830,8737,5615,3265]
-        dutch_peers = PeerRecord.objects.filter(session__in=self.session_set.all(),peerinfo__country="NL").distinct()
-        dutch_peers_count = PeerRecord.objects.filter(session__in=self.session_set.all(),peerinfo__country="NL").count()
-        result = {}
-        result["total"] = dutch_peers_count
+        dutch_asnumbers = [9143, 6830, 8737, 5615, 3265]
+        dutch_peers = PeerRecord.objects.filter(session__in=self.session_set.all(), peerinfo__country="NL").select_related().distinct()
+        # dutch_peers_count = PeerRecord.objects.filter(session__in=self.session_set.all(),
+        #                                               peerinfo__country="NL").count()
+        dutch_peers_count = dutch_peers.count()
+
+        result = {"total": dutch_peers_count}
         for asn in dutch_asnumbers:
             # result[ASN.objects.get(asn).name] = dutch_peers.filter(peerinfo__asnumber__number=asn).count() / dutch_peers_count
             try:
                 asname = ASN.objects.get(number=asn).name
             except ObjectDoesNotExist:
                 asname = str(asn)
-            result[asname] = (dutch_peers.filter(peerinfo__asnumber__number=asn).count() /float(dutch_peers_count)) * 100
+            result[asname] = (dutch_peers.filter(peerinfo__asnumber__number=asn).count() / float(
+                dutch_peers_count)) * 100
         return result
-        
+
+    def get_statistics(self, country_code="NL", as_numbers=(9143, 6830, 8737, 5615, 3265)):
+        result = {}
+        peers = PeerRecord.objects.filter(session__in=self.session_set.all()).select_related()
+        peers_count_total = peers.values_list('ip').distinct().count()
+        peers_country = peers.filter(peerinfo__country=country_code).values_list('ip').distinct()
+        peers_count_country = peers_country.count()
+
+        for asn in as_numbers:
+            try:
+                asname = ASN.objects.get(number=asn).name
+            except ObjectDoesNotExist:
+                asname = str(asn)
+            result[asname] = (peers_country.filter(peerinfo__asnumber__number=asn).count() / float(
+                peers_count_country)) * 100
+
+        result['total_distinct'] = peers_count_total
+        result['total_distinct_' + country_code] = peers_count_country
+        return result
+
+
+
     @property
     def sorted_session_set(self):
         return self.session_set.order_by('-date_created')
@@ -173,10 +198,11 @@ class PeerInfo(models.Model):
     ip = models.GenericIPAddressField(db_index=True)
     asnumber = models.ForeignKey("ASN", null=True, blank=True, on_delete=models.SET_NULL)
     iptype = models.IntegerField(choices=IP_TYPE)
-    country = models.CharField(max_length=255, default="", null=True)
+    country = models.CharField(max_length=255, default="", null=True, db_index=True)
 
     def __unicode__(self):
         return self.ip
+
 
 def convert6to4(ip):
     if not ":" in ip:
@@ -184,18 +210,19 @@ def convert6to4(ip):
     if not ip.startswith("2002:"):
         return ip
     s = ip.split(":")
-    first,last = s[1:3]
+    first, last = s[1:3]
     if len(first) < 4:
-        first = "0"+first
+        first = "0" + first
     if len(last) < 4:
-        last = "0"+last
-    return "%s.%s.%s.%s" % (int(first[0:2],16),int(first[2:4],16),int(last[0:2],16),int(last[2:4],16))
+        last = "0" + last
+    return "%s.%s.%s.%s" % (int(first[0:2], 16), int(first[2:4], 16), int(last[0:2], 16), int(last[2:4], 16))
+
 
 class PeerRecord(models.Model):
-    ip = models.GenericIPAddressField()
+    ip = models.GenericIPAddressField(db_index=True)
     date_added = models.DateTimeField(auto_now_add=True)
     session = models.ForeignKey(Session)
-    peerinfo = models.ForeignKey(PeerInfo, null=True,blank=True)
+    peerinfo = models.ForeignKey(PeerInfo, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.peerinfo:
@@ -205,7 +232,7 @@ class PeerRecord(models.Model):
             else:
                 iptype = 4
             try:
-                self.peerinfo = PeerInfo.objects.get_or_create(ip=convertedIP,defaults={'iptype':iptype})[0]
+                self.peerinfo = PeerInfo.objects.get_or_create(ip=convertedIP, defaults={'iptype': iptype})[0]
             except:
                 self.peerinfo = None
         super(PeerRecord, self).save(*args, **kwargs)

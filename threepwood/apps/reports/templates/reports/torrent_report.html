@@ -1,7 +1,6 @@
 {% extends 'reports/reports.html' %}
 {% load crispy_forms_tags %}
 {% load url from future %}
-{% load bootstrap_pagination %}
 
 {% block container %}
 
@@ -9,22 +8,20 @@
     <h2>Metadata</h2>
     <ul class="unstyled">
         <li>{{ torrent.torrentmetadata.name }}</li>
-        <li>Total distinct peers {{ torrent.distinct_peers }}</li>
-        <li>Dutch statistics:
+{#        <li>Total distinct peers {{ torrent.distinct_peers_count }}</li>#}
+        <li>Statistics:
             <table class="table">
                 <thead><th>ASName</th><th>Percentage</th></thead>
                 <tbody>
-                    {% for key, value in torrent.dutch_peers.items %}
+                    {% for key, value in torrent.get_statistics.items %}
                        <tr> <td>{{ key }}</td> <td>{{ value|floatformat:2  }}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
-            </ul>
         </li>
     </ul>
 
       <h2>Sessions({{ torrent.session_set.all|length }})</h2>
-{#    {% bootstrap_paginate page_obj url_view_name="reports_torrent_detail_paginate" range=10 show_prev_next="true" show_first_last="true" url_extra_args=torrent %}#}
 
     <div class="pagination">
         <span class="step-links">
