@@ -162,6 +162,10 @@ class ASN(models.Model):
             return self.name
         else:
             return str(self.number)
+    def get_total(self):
+        return PeerInfo.objects.filter(asnumber=self.number).count()
+    def get_total_dutch(self):
+        return PeerInfo.objects.filter(asnumber=self.number,country="NL").count()
 
 
 class PeerInfo(models.Model):
