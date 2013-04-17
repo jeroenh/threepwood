@@ -172,7 +172,8 @@ class Session(models.Model):
         super(Session, self).save(*args, **kwargs)
 
     def get_size(self):
-        return self.peerrecord_set.values_list('ip', flat=True).distinct().count()
+        return PeerRecord.objects.get(session=self.id).distinct().count()
+        # return self.peerrecord_set.values_list('ip', flat=True).distinct().count()
 
     def __unicode__(self):
         return u"{0} {1} {2}".format(self.client, self.torrent.torrentmetadata.name, self.date_created)
