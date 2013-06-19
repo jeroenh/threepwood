@@ -80,9 +80,19 @@ def get_torrent_stats(torrent, countries=None, asns=None):
 
     return results
 
+def asn_filter(country="NL"):
+    result = defaultdict(list)
+    asnumbers = PeerInfo.objects.filter(country=country_code).values_list('asnumber', flat=True).distinct()
+    for a in asnumbers:
+        asn = ASN.objects.get(number=a)
+        name = asn.name.split()[0]
+        result[name].append(asn.number)
+    return result
 
-if __name__ == "__main__":
+    
 
+
+def main()
     #global tele2 as is AS1257, NL is 13127
     asns = [31615, 9143, 3265, 6830, 31615, 5615, 49562, 286, 1134, 12469, 13127]
 
@@ -98,3 +108,6 @@ if __name__ == "__main__":
         print "\n"
     for k in sorted_stats:
         print "\"{0}\"".format(k['name']),
+        
+if __name__ == "__main__":
+    main()
