@@ -92,7 +92,7 @@ def asn_filter(country="NL"):
     
 
 
-def main()
+def main():
     #global tele2 as is AS1257, NL is 13127
     asns = [31615, 9143, 3265, 6830, 31615, 5615, 49562, 286, 1134, 12469, 13127]
 
