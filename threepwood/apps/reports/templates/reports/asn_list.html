@@ -1,0 +1,36 @@
+{% extends 'reports/reports.html' %}
+{% load crispy_forms_tags %}
+{% load url from future %}
+
+
+{% block report %}
+
+    <h1>AS Numbers</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>AS Number</th>
+            <th>AS Name</th>
+            <th>Number of IPs</th>
+            <th>Number of Dutch IPs</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for asn in asn_list %}
+            <tr data-id="{{ asn.number }}">
+                <td>
+                    <a href="{% url "reports_asn_detail" asn.pk %}">{{ asn.number }}</a>
+                </td>
+                <td>
+                    {{ asn.name }}
+                </td>
+                <td>{{ asn.get_total }}</td>
+                <td>
+                    {{ asn.get_total_dutch }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

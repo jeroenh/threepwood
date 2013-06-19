@@ -1,0 +1,9 @@
+{% extends 'reports/reports.html' %}
+{% load crispy_forms_tags %}
+{% load url from future %}
+
+{% block report %}
+<p>{{asn.number}}: {{asn.name}}</p>
+
+{% endblock %}
+
