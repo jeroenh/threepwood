@@ -161,7 +161,28 @@ def post_peers(request):
 
     return http.HttpResponse(content=dumps(res), mimetype='application/json')
 
-
+@csrf_exempt
+#this view is used by lechuck to report pirates/peers. no need for csrf prottection
+def post_torrents(request):
+    res = {'success': False}
+    data = loads(request.body)
+    
+    if request.method == 'POST':
+        if 'torrent' in data.keys():
+            name = data['torrent']
+            info_hash = data['hash']
+            try:
+                t = Torrent.objects.get(magnet=name)
+            except:
+                t = Torrent(info_hash=info_hash,magnet=name,description=name)
+            t.save()
+            t.clients.add(Client.objects.get(key="65d114220c370f9f20a44135812a349e529747cc"))
+            t.save()
+            print t
+            res['hash'] = t.info_hash
+            res['success'] = True
+    return http.HttpResponse(content=dumps(res), mimetype='application/json')
+    
 def get_sessions_and_torrents_for_client(client, ip, version):
     result = []
 
