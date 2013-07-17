@@ -29,6 +29,7 @@ urlpatterns = patterns('threepwood.apps.collector.views',
 
 
     url(r'^post_peers/$', 'post_peers',  name='collector_post_peers'),
+    url(r'^post_torrents/$', 'post_torrents',  name='collector_post_torrents'),
     url(r'^get_torrents/$', 'get_torrents',  name='collector_get_torrents'),
 
 )
