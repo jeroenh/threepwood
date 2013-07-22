@@ -81,9 +81,17 @@ def get_country_stats_new():
             else:
                 print "torrent " + str(idx) + " has 0 :("
 
-    pp = pprint.PrettyPrinter(indent=4)
 
-    pp.pprint(pcountries)
+    f = open("countries-percentage.txt", 'w')
+
+    line = " ".join(sorted(pcountries.keys()))
+
+    for country_code in sorted(pcountries.keys()):
+        line = country_code + "\t" + " ".join(pcountries[country_code])
+        f.write("%s\n" % line )
+    f.close()
+
+
 
 
 def get_torrent_stats(torrent, countries=None, asns=None):
