@@ -1,4 +1,3 @@
-
 __author__ = 'cdumitru'
 
 import os
@@ -45,15 +44,42 @@ def get_country_counts():
 
 def get_country_stats_new():
     tcountries = defaultdict(list)
+
+    #a list of country codes
     countries = PeerInfo.objects.values_list('country', flat=True).distinct()
+    total_ips_torrent = []
 
     for t in Torrent.objects.all()[6:]:
-
+        #for each torrent
         for country_code in countries:
+            #for each country
+            #add to the torrent stats
+            #       select all the peer records for this torrent
+            #       but only from the current country
+            #       extract the ip
+            #       filter out duplicates and count
             tcountries[country_code].append(PeerRecord.objects.filter(session__torrent__id=t.id,
-                                                                      peerinfo__country=country_code).values_list('ip',
-                                                                                                                  flat=True).distinct().count())
-    pprint.pprint(tcountries)
+                                                                      peerinfo__country=country_code)
+            .values_list('ip', flat=True).distinct().count())
+
+        #count total ips for this torrent
+        total_ips_torrent.append(
+            PeerRecord.objects.filter(session__torrent__id=t.id).values_list('ip', flat=True).distinct().count())
+
+    #compute percentage of country per torrent
+
+    pcountries = defaultdict(list)
+
+    for country_code in tcountries.keys():
+
+        #the index is used to retreive the totals for that torrent from the total_ips_torrent array
+        # the asumption here is that the ip values were added in the same order for both the country list and the
+        # totals list so similar position
+        for value, idx in enumerate(tcountries[country_code]):
+            pcountries[country_code] = float(value) / total_ips_torrent[idx] * 100
+
+    pprint.pprint(pcountries)
+
 
 def get_torrent_stats(torrent, countries=None, asns=None):
     """
