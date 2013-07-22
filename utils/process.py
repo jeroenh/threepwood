@@ -45,9 +45,13 @@ def get_country_counts():
 def get_country_stats_new():
     tcountries = defaultdict(list)
 
+    #holds numeric values
+    torrent_stats_raw = defaultdict(list)
+    torrent_stats_percentages = defaultdict(list)
+
+
     #a list of country codes
-    countries = PeerInfo.objects.values_list('country', flat=True).distinct()
-    total_ips_torrent = []
+    countries = sorted(PeerInfo.objects.values_list('country', flat=True).distinct())
 
     for t in Torrent.objects.all()[6:]:
         #for each torrent
@@ -58,37 +62,36 @@ def get_country_stats_new():
             #       but only from the current country
             #       extract the ip
             #       filter out duplicates and count
-            tcountries[country_code].append(PeerRecord.objects.filter(session__torrent__id=t.id,
+            #   append it to the torrent stats
+            #order in which we walk the countries array is important!
+            torrent_stats_raw[t].append(PeerRecord.objects.filter(session__torrent__id=t.id,
                                                                       peerinfo__country=country_code)
             .values_list('ip', flat=True).distinct().count())
 
         #count total ips for this torrent
-        total_ips_torrent.append(
-            PeerRecord.objects.filter(session__torrent__id=t.id).values_list('ip', flat=True).distinct().count())
+        total_ip_count = PeerRecord.objects.filter(session__torrent__id=t.id).values_list('ip', flat=True).distinct().count()
 
-    #compute percentage of country per torrent
-
-    pcountries = defaultdict(list)
-
-    for country_code in tcountries.keys():
-
-        #the index is used to retreive the totals for that torrent from the total_ips_torrent array
-        # the asumption here is that the ip values were added in the same order for both the country list and the
-        # totals list so similar position
-        for idx, value in enumerate(tcountries[country_code]):
-            if total_ips_torrent[idx] :
-                pcountries[country_code].append(float(value) / total_ips_torrent[idx] * 100)
+        #compute percentage
+        for country_value in torrent_stats_raw[t]:
+            if total_ip_count:
+                torrent_stats_percentages[t].append(float(country_value) / total_ip_count * 100)
             else:
-                print "torrent " + str(idx) + " has 0 :("
+                #some torrents might have no data
+                torrent_stats_percentages[t].append(0)
+
+        #append a last column with totals for the raw values
+        torrent_stats_raw[t].append(total_ip_count)
+
 
     f = open("countries-percentage.txt", 'w')
 
-    f.write("# each column is one torrent, each line is one country. values are percentage of ip from country for that torrent\n")
-    line = " ".join(Torrent.objects.all()[6:])
+    f.write("# each column is a country , each line is a torrent . values are percentage of ips from country for that torrent\n")
+
+    line = "torrent\t\t" + " ".join(countries)
     f.write("%s\n" % line)
 
-    for country_code in sorted(pcountries.keys()):
-        line = country_code + "\t" + " ".join(str(s) for s in pcountries[country_code])
+    for t in Torrent.objects.all()[6:]:
+        line = t + "\t\t" + " ".join(str(s) for s in torrent_stats_percentages[t])
         f.write("%s\n" % line)
     f.close()
 
