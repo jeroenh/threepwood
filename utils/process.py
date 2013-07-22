@@ -84,7 +84,7 @@ def get_country_stats_new():
     f = open("countries-percentage.txt", 'w')
 
     f.write("# each column is one torrent, each line is one country. values are percentage of ip from country for that torrent\n")
-    line = " ".join(sorted(pcountries.keys()))
+    line = " ".join(Torrent.objects.all()[6:])
     f.write("%s\n" % line)
 
     for country_code in sorted(pcountries.keys()):
