@@ -78,7 +78,9 @@ def get_country_stats_new():
         for value, idx in enumerate(tcountries[country_code]):
             pcountries[country_code] = float(value) / total_ips_torrent[idx] * 100
 
-    pprint.pprint(pcountries)
+    pp = pprint.PrettyPrinter(indent=4)
+
+    pp.pprint(pcountries)
 
 
 def get_torrent_stats(torrent, countries=None, asns=None):
