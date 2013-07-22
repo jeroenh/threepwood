@@ -81,14 +81,15 @@ def get_country_stats_new():
             else:
                 print "torrent " + str(idx) + " has 0 :("
 
-
     f = open("countries-percentage.txt", 'w')
 
+    f.write("# each column is one torrent, each line is one country ")
     line = " ".join(sorted(pcountries.keys()))
+    f.write("%s\n" % line)
 
     for country_code in sorted(pcountries.keys()):
-        line = country_code + "\t" + " ".join(pcountries[country_code])
-        f.write("%s\n" % line )
+        line = country_code + "\t" + " ".join(str(s) for s in pcountries[country_code])
+        f.write("%s\n" % line)
     f.close()
 
 
