@@ -91,7 +91,7 @@ def get_country_stats_new():
     f.write("%s\n" % line)
 
     for t in Torrent.objects.all()[6:]:
-        line = t + "\t\t" + " ".join(str(s) for s in torrent_stats_percentages[t])
+        line = t.description.replace(' ', '_') + "\t\t" + " ".join(str(s) for s in torrent_stats_percentages[t])
         f.write("%s\n" % line)
     f.close()
 
