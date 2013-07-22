@@ -75,9 +75,9 @@ def get_country_stats_new():
         #the index is used to retreive the totals for that torrent from the total_ips_torrent array
         # the asumption here is that the ip values were added in the same order for both the country list and the
         # totals list so similar position
-        for value, idx in enumerate(tcountries[country_code]):
+        for idx, value in enumerate(tcountries[country_code]):
             if total_ips_torrent[idx] :
-                pcountries[country_code] = float(value) / total_ips_torrent[idx] * 100
+                pcountries[country_code].append(float(value) / total_ips_torrent[idx] * 100)
             else:
                 print "torrent " + str(idx) + " has 0 :("
 
