@@ -1,10 +1,10 @@
-from django.contrib.gis.tests.geoapp.models import Country
 
 __author__ = 'cdumitru'
 
 import os
 import pprint
 from collections import defaultdict
+import numpy
 
 if not os.environ.get("DJANGO_SETTINGS_MODULE"):
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "threepwood.local_settings")
@@ -17,7 +17,7 @@ def get_country_counts():
     #TODO matrix style
 
     tcountries = defaultdict(list)
-    all_countries = Country.objects.all()
+    all_countries = PeerInfo.objects.values_list('country', flat=True).distinct()
     for t in Torrent.objects.all()[6:]:
 
         countries = defaultdict(int)
