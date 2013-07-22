@@ -79,7 +79,7 @@ def get_country_stats_new():
             if total_ips_torrent[idx] :
                 pcountries[country_code] = float(value) / total_ips_torrent[idx] * 100
             else:
-                print "torrent " + idx + "has 0 :("
+                print "torrent " + str(idx) + " has 0 :("
 
     pp = pprint.PrettyPrinter(indent=4)
 
