@@ -99,25 +99,52 @@ def get_country_stats_new():
 def get_torrent_csv_out():
     country_code = 'NL'
     totals = defaultdict(list)
+    country_as = PeerInfo.objects.filter(country=country_code).values_list('asnumber', flat=True).distinct()
+
+    clean_asn =[]
+    done_clean_asn = False
 
     for t in Torrent.objects.all()[6:]:
         #a list of all the ASs from this country
         torrent_name = t.description.strip().replace(' ', '_')
-        country_as = PeerInfo.objects.filter(country=country_code).values_list('asnumber', flat=True).distinct()
 
         #all the ips for this country
         total_ip_country = PeerRecord.objects.filter(session__torrent__id=t.id,
                                                      peerinfo__country=country_code).values_list('ip',
                                                                                                  flat=True).distinct().count()
+        total_ip_global = PeerRecord.objects.filter(session__torrent__id=t.id,).values_list('ip',
+                                                                                                 flat=True).distinct().count()
+
 
         #count ips for each as
+        total_kpn = 0
         for as_number in country_as:
-            totals[torrent_name].append((as_number,PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number).values_list('ip',
-                                                                                           flat=True).distinct().count()))
+            if as_number in [5615, 49562, 286, 1134, 12469]:
+                total_kpn += PeerRecord.objects.filter(session__torrent__id=t.id,
+                                                       peerinfo__asnumber=as_number).values_list('ip',
+                                                                                                 flat=True).distinct().count()
+            else:
+                totals[torrent_name].append(PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number).values_list('ip',
+                                                                                           flat=True).distinct().count())
+                if not done_clean_asn:
+                    clean_asn.append(as_number)
 
-        totals.appeend(total_ip_country)
+        if not done_clean_asn:
+            clean_asn.append(286)
+            done_clean_asn = True
+        totals[torrent_name].append(total_kpn)
+        totals[torrent_name].append(total_ip_country)
+        totals[torrent_name].append(total_ip_global)
 
-    pprint.pprint(totals)
+    f = open("dutch-totals.csv", 'w')
+    line = "torrent," + ",".join(clean_asn) + 'dutch_total,global_total\n'
+    f.write(line)
+    for t in totals.keys():
+        line = t + "," + ",".join(totals[t]) + "\n"
+        f.write(line)
+    f.close()
+
+
 
 
 
