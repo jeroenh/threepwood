@@ -120,7 +120,7 @@ def get_torrent_csv_out():
         #count ips for each as
         total_kpn = 0
         for as_number in country_as:
-            if as_number in [5615, 49562, 286, 1134, 12469]:
+            if as_number in [5615, 49562, 286, 1134, 12469, 8737]:
                 total_kpn += PeerRecord.objects.filter(session__torrent__id=t.id,
                                                        peerinfo__asnumber=as_number).values_list('ip',
                                                                                                  flat=True).distinct().count()
