@@ -111,9 +111,9 @@ def get_torrent_csv_out():
 
         #all the ips for this country
         total_ip_country = PeerRecord.objects.filter(session__torrent__id=t.id,
-                                                     peerinfo__country=country_code, session__version=version).values_list('ip',
+                                                     peerinfo__country=country_code).values_list('ip',
                                                                                                  flat=True).distinct().count()
-        total_ip_global = PeerRecord.objects.filter(session__torrent__id=t.id,session__version=version).values_list('ip',
+        total_ip_global = PeerRecord.objects.filter(session__torrent__id=t.id).values_list('ip',
                                                                                                  flat=True).distinct().count()
 
 
@@ -122,10 +122,10 @@ def get_torrent_csv_out():
         for as_number in country_as:
             if as_number in [5615, 49562, 286, 1134, 12469]:
                 total_kpn += PeerRecord.objects.filter(session__torrent__id=t.id,
-                                                       peerinfo__asnumber=as_number,session__version=version).values_list('ip',
+                                                       peerinfo__asnumber=as_number).values_list('ip',
                                                                                                  flat=True).distinct().count()
             else:
-                totals[torrent_name].append(PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number,session__version=version).values_list('ip',
+                totals[torrent_name].append(PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number).values_list('ip',
                                                                                            flat=True).distinct().count())
                 if not done_clean_asn:
                     clean_asn.append(as_number)
@@ -137,7 +137,7 @@ def get_torrent_csv_out():
         totals[torrent_name].append(total_ip_country)
         totals[torrent_name].append(total_ip_global)
 
-    f = open("dutch-totals-"+version+".csv", 'w')
+    f = open("dutch-totals-1302.csv", 'w')
     as_names = []
     for s in clean_asn:
         as_names.append(ASN.objects.get(number=s).name.split()[0])
