@@ -107,7 +107,6 @@ def get_torrent_csv_out():
 
     for t in Torrent.objects.all()[6:]:
         #a list of all the ASs from this country
-        torrent_name = t.description.strip().replace(' ', '_')
 
         #all the ips for this country
         total_ip_country = PeerRecord.objects.filter(session__torrent__id=t.id,
@@ -125,7 +124,7 @@ def get_torrent_csv_out():
                                                        peerinfo__asnumber=as_number, session__version=version).values_list('ip',
                                                                                                  flat=True).distinct().count()
             else:
-                totals[torrent_name].append(PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number, session__version=version).values_list('ip',
+                totals[t].append(PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number, session__version=version).values_list('ip',
                                                                                            flat=True).distinct().count())
                 if not done_clean_asn:
                     clean_asn.append(as_number)
@@ -133,9 +132,9 @@ def get_torrent_csv_out():
         if not done_clean_asn:
             clean_asn.append(286)
             done_clean_asn = True
-        totals[torrent_name].append(total_kpn)
-        totals[torrent_name].append(total_ip_country)
-        totals[torrent_name].append(total_ip_global)
+        totals[t].append(total_kpn)
+        totals[t].append(total_ip_country)
+        totals[t].append(total_ip_global)
 
     f = open("dutch-totals-" + version +".csv", 'w')
     as_names = []
@@ -145,8 +144,9 @@ def get_torrent_csv_out():
     line = "torrent," + ",".join(as_names) + ',dutch_total,global_total\n'
     f.write(line)
     for t in totals.keys():
+        torrent_name = t.torrentmetadata.name
         if totals[t][-1]:
-            line = t + "," + ",".join(str(s) for s in totals[t]) + "\n"
+            line = torrent_name + "," + ",".join(str(s) for s in totals[t]) + "\n"
             f.write(line)
     f.close()
 
