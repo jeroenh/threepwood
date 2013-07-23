@@ -138,7 +138,11 @@ def get_torrent_csv_out():
         totals[torrent_name].append(total_ip_global)
 
     f = open("dutch-totals-"+version+".csv", 'w')
-    line = "torrent," + ",".join(str(s) for s in clean_asn) + 'dutch_total,global_total\n'
+    as_names = []
+    for s in clean_asn:
+        as_names.append(ASN.objects.get(number=s).name.split()[0])
+
+    line = "torrent," + ",".join(as_names) + ',dutch_total,global_total\n'
     f.write(line)
     for t in totals.keys():
         line = t + "," + ",".join(str(s) for s in totals[t]) + "\n"
