@@ -3,7 +3,6 @@ __author__ = 'cdumitru'
 import os
 import pprint
 from collections import defaultdict
-import numpy
 
 if not os.environ.get("DJANGO_SETTINGS_MODULE"):
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "threepwood.local_settings")
@@ -94,6 +93,31 @@ def get_country_stats_new():
         line = t.description.strip().replace(' ', '_') + "\t\t" + " ".join(str(s) for s in torrent_stats_percentages[t])
         f.write("%s\n" % line)
     f.close()
+
+
+
+def get_torrent_csv_out():
+    country_code = 'NL'
+    totals = defaultdict(list)
+
+    for t in Torrent.objects.all()[6:]:
+        #a list of all the ASs from this country
+        torrent_name = t.description.strip().replace(' ', '_')
+        country_as = PeerInfo.objects.filter(country=country_code).values_list('asnumber', flat=True).distinct()
+
+        #all the ips for this country
+        total_ip_country = PeerRecord.objects.filter(session__torrent__id=t.id,
+                                                     peerinfo__country=country_code).values_list('ip',
+                                                                                                 flat=True).distinct().count()
+
+        #count ips for each as
+        for as_number in country_as:
+            totals[torrent_name].append((as_number,PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number).values_list('ip',
+                                                                                           flat=True).distinct().count()))
+
+        totals.appeend(total_ip_country)
+
+    pprint.pprint(totals)
 
 
 
@@ -193,4 +217,6 @@ if __name__ == "__main__":
     # for k in sorted_stats:
     #     print "\"{0}\"".format(k['name']),
 
-    get_country_stats_new()
+    # get_country_stats_new()
+
+    get_torrent_csv_out()
