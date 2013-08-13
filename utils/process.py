@@ -52,6 +52,9 @@ def get_country_stats_new():
     #a list of country codes
     countries = sorted(PeerInfo.objects.values_list('country', flat=True).distinct())
 
+    f = open("countries-1302.txt", 'w')
+    line = "torrent\t\t" + " ".join(countries) + " total"
+    f.write("%s\n" % line)
     for t in Torrent.objects.all()[6:]:
         #for each torrent
         for country_code in countries:
@@ -64,41 +67,41 @@ def get_country_stats_new():
             #   append it to the torrent stats
             #order in which we walk the countries array is important!
             torrent_stats_raw[t].append(PeerRecord.objects.filter(session__torrent__id=t.id,
-                                                                      peerinfo__country=country_code)
+                                                                      peerinfo__country=country_code, peerinfo__iptype="4")
             .values_list('ip', flat=True).distinct().count())
 
         #count total ips for this torrent
-        total_ip_count = PeerRecord.objects.filter(session__torrent__id=t.id).values_list('ip', flat=True).distinct().count()
+        total_ip_count = PeerRecord.objects.filter(session__torrent__id=t.id,peerinfo__iptype="4").values_list('ip', flat=True).distinct().count()
 
+        if total_ip_count:
+            line = t.description.strip().replace(' ', '_') + "\t\t" + " ".join(str(s) for s in torrent_stats_raw[t]) + " " + str(total_ip_count)
+            f.write("%s\n" % line)
         #compute percentage
-        for country_value in torrent_stats_raw[t]:
-            if total_ip_count:
-                torrent_stats_percentages[t].append(float(country_value) / total_ip_count * 100)
-            else:
-                #some torrents might have no data
-                torrent_stats_percentages[t].append(0)
+        #for country_value in torrent_stats_raw[t]:
+        #    if total_ip_count:
+        #        torrent_stats_percentages[t].append(float(country_value) / total_ip_count * 100)
+        #    else:
+        #        #some torrents might have no data
+        #        torrent_stats_percentages[t].append(0)
 
         #append a last column with totals for the raw values
-        torrent_stats_raw[t].append(total_ip_count)
+        #torrent_stats_raw[t].append(total_ip_count)
 
 
-    f = open("countries-percentage.txt", 'w')
 
-    f.write("# each column is a country , each line is a torrent . values are percentage of ips from country for that torrent\n")
+    #f.write("# each column is a country , each line is a torrent . values are percentage of ips from country for that torrent\n")
 
-    line = "torrent\t\t" + " ".join(countries)
-    f.write("%s\n" % line)
 
-    for t in Torrent.objects.all()[6:]:
-        line = t.description.strip().replace(' ', '_') + "\t\t" + " ".join(str(s) for s in torrent_stats_percentages[t])
-        f.write("%s\n" % line)
+    #for t in Torrent.objects.all()[6:]:
+    #    line = t.description.strip().replace(' ', '_') + "\t\t" + " ".join(str(s) for s in torrent_stats_percentages[t])
+    #    f.write("%s\n" % line)
     f.close()
 
 
 
 def get_torrent_csv_out():
     country_code = 'NL'
-    version='1204'
+    version='1302'
     totals = defaultdict(list)
     country_as = PeerInfo.objects.filter(country=country_code).values_list('asnumber', flat=True).distinct()
 
@@ -110,9 +113,9 @@ def get_torrent_csv_out():
 
         #all the ips for this country
         total_ip_country = PeerRecord.objects.filter(session__torrent__id=t.id,
-                                                     peerinfo__country=country_code, session__version=version).values_list('ip',
+                                                     peerinfo__country=country_code).values_list('ip',
                                                                                                  flat=True).distinct().count()
-        total_ip_global = PeerRecord.objects.filter(session__torrent__id=t.id, session__version=version).values_list('ip',
+        total_ip_global = PeerRecord.objects.filter(session__torrent__id=t.id).values_list('ip',
                                                                                                  flat=True).distinct().count()
 
 
@@ -121,10 +124,10 @@ def get_torrent_csv_out():
         for as_number in country_as:
             if as_number in [5615, 49562, 286, 1134, 12469, 8737]:
                 total_kpn += PeerRecord.objects.filter(session__torrent__id=t.id,
-                                                       peerinfo__asnumber=as_number, session__version=version).values_list('ip',
+                                                       peerinfo__asnumber=as_number).distinct().values_list('ip',
                                                                                                  flat=True).distinct().count()
             else:
-                totals[t].append(PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number, session__version=version).values_list('ip',
+                totals[t].append(PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number).distinct().values_list('ip',
                                                                                            flat=True).distinct().count())
                 if not done_clean_asn:
                     clean_asn.append(as_number)
@@ -250,6 +253,6 @@ if __name__ == "__main__":
     # for k in sorted_stats:
     #     print "\"{0}\"".format(k['name']),
 
-    # get_country_stats_new()
+    #get_country_stats_new()
 
     get_torrent_csv_out()
