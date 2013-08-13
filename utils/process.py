@@ -124,10 +124,10 @@ def get_torrent_csv_out():
         for as_number in country_as:
             if as_number in [5615, 49562, 286, 1134, 12469, 8737]:
                 total_kpn += PeerRecord.objects.filter(session__torrent__id=t.id,
-                                                       peerinfo__asnumber=as_number).distinct().values_list('ip',
+                                                       peerinfo__asnumber=as_number,peerinfo__country=country_code).distinct().values_list('ip',
                                                                                                  flat=True).distinct().count()
             else:
-                totals[t].append(PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number).distinct().values_list('ip',
+                totals[t].append(PeerRecord.objects.filter(session__torrent__id=t.id, peerinfo__asnumber=as_number,peerinfo__country=country_code).distinct().values_list('ip',
                                                                                            flat=True).distinct().count())
                 if not done_clean_asn:
                     clean_asn.append(as_number)
