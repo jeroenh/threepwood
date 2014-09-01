@@ -55,7 +55,7 @@ def get_country_stats_new():
     f = open("countries-1302.txt", 'w')
     line = "torrent\t\t" + " ".join(countries) + " total"
     f.write("%s\n" % line)
-    for t in Torrent.objects.all()[6:]:
+    for t in Torrent.objects.all()[5:]:
         #for each torrent
         for country_code in countries:
             #for each country
